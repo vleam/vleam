@@ -1,0 +1,61 @@
+{
+  "name": "vleam",
+  "version": "0.1.0",
+  "description": "Code using Gleam in Vue projects",
+  "repository": {
+    "url": "https://github.com/ofekd/vleam"
+  },
+  "bin": {
+    "vleam": "./dist/cli.mjs"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch src",
+    "format": "prettier -w src"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "default": "./dist/index.mjs"
+    }
+  },
+  "keywords": [
+    "gleam",
+    "vue",
+    "vite-plugin"
+  ],
+  "files": [
+    "dist"
+  ],
+  "author": "Ofek Doitch",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@vue/compiler-core": "^3.4.23",
+    "@vue/compiler-dom": "^3.4.23",
+    "cac": "^6.7.14",
+    "picocolors": "^1.0.0",
+    "prettier": "^3.0.2",
+    "tsup": "^8.0.2",
+    "typescript": "^5.4.4"
+  },
+  "dependencies": {
+    "@vue/compiler-sfc": "^3.4.21",
+    "@vueuse/core": "^10.9.0",
+    "json-rpc-2.0": "^1.7.0",
+    "magic-string": "^0.30.9",
+    "rimraf": "^5.0.5",
+    "rollup": "^4.14.0",
+    "toml": "^3.0.0",
+    "vite": "^5.2.8",
+    "vite-gleam": "link:../gleam-tools/packages/vite-gleam",
+    "vscode-jsonrpc": "^8.2.0",
+    "vscode-languageclient": "^9.0.1",
+    "vscode-uri": "^3.0.8",
+    "vue": "^3.4.21"
+  }
+}

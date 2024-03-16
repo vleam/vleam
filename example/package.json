@@ -1,0 +1,42 @@
+{
+  "name": "vleam-todo",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "run-p type-check \"build-only {@}\" --",
+    "preview": "vite preview",
+    "build-only": "vite build",
+    "type-check": "vue-tsc --build --force",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
+    "format": "prettier --write src/"
+  },
+  "dependencies": {
+    "pinia": "^2.1.7",
+    "vleam": "link:..",
+    "vue": "^3.4.23",
+    "vue-router": "^4.3.2"
+  },
+  "devDependencies": {
+    "@rushstack/eslint-patch": "^1.10.2",
+    "@tsconfig/node20": "^20.1.4",
+    "@types/node": "^20.12.7",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "@vue/eslint-config-prettier": "^9.0.0",
+    "@vue/eslint-config-typescript": "^13.0.0",
+    "@vue/tsconfig": "^0.5.1",
+    "@vue/typescript-plugin": "^2.0.13",
+    "eslint": "^9.1.0",
+    "eslint-plugin-vue": "^9.25.0",
+    "npm-run-all2": "^6.1.2",
+    "prettier": "^3.0.3",
+    "ts-gleam": "^1.0.1",
+    "typescript": "~5.4.5",
+    "vite": "^5.2.10",
+    "vite-plugin-inspect": "^0.8.4",
+    "vite-plugin-vue-devtools": "^7.0.27",
+    "vue-tsc": "^2.0.13"
+  }
+}

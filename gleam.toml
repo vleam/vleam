@@ -1,0 +1,19 @@
+name = "vleam"
+version = "0.1.0"
+licences = ["Apache-2.0"]
+description = "Vue composition API bindings for Gleam"
+
+gleam = "~> 1.0"
+target = "javascript"
+
+repository = { type = "github", user = "vleam", repo = "vleam" }
+
+[javascript]
+typescript_declarations = true
+
+[dependencies]
+gleam_stdlib = "~> 0.36 or ~> 1.0"
+gleam_javascript = "~> 0.8"
+
+[dev-dependencies]
+gleeunit = "~> 1.0"
