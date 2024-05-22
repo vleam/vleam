@@ -1,14 +1,11 @@
-import * as fs from "node:fs/promises";
+import * as fs from "fs";
 import * as path from "path";
 
 const TEMP_DIR = "vleam_generated";
 export const baseGeneratedGleamPath = (srcPath: string) =>
   path.join(srcPath, TEMP_DIR);
 
-export async function toGleamPath(
-  srcPath: string,
-  vuePath: string,
-): Promise<string> {
+export function toGleamPath(srcPath: string, vuePath: string): string {
   vuePath = vuePath.replace(".vue", ".gleam");
 
   const relativeModulePath = path.relative(srcPath, path.dirname(vuePath));
@@ -20,7 +17,7 @@ export async function toGleamPath(
     moduleFileName,
   );
 
-  await fs.mkdir(path.dirname(pathResult), { recursive: true });
+  fs.mkdirSync(path.dirname(pathResult), { recursive: true });
 
   return pathResult;
 }
