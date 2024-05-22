@@ -67,6 +67,8 @@ export default defineConfig({
 });
 ```
 
+Add `src/vleam_generated` to `.gitignore`.
+
 For Neovim support, install [vleam.nvim](https://github.com/vleam/vleam.nvim).
 
 For VSCode support, install the vleam plugin.
