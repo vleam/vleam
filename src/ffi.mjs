@@ -65,11 +65,14 @@ function isOption(maybeOption) {
 
 export function addSetup(componentBase, setup) {
   componentBase.setup = (props, { emits }) => {
-    const result = setup(
+    const computedProps =
       componentBase.props &&
-        Object.entries(componentBase.props)
-          .sort((a, b) => a[1].position - b[1].position)
-          .map(([name]) => props[name]),
+      Object.entries(componentBase.props)
+        .sort((a, b) => a[1].position - b[1].position)
+        .map(([name]) => vueComputed(() => props[name]));
+
+    const result = setup(
+      computedProps,
       componentBase.emits?.map((name) => (data) => emits(name, data)),
     );
 

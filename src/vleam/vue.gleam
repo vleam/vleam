@@ -171,7 +171,7 @@ pub fn define_component(
 pub fn with_1_prop(
   component: ComponentBase(props, emits),
   props: #(Prop(p1)),
-) -> ComponentBase(#(p1), emits)
+) -> ComponentBase(#(Computed(p1)), emits)
 
 /// Define 2 props on a component
 /// See `define_component` for a full example.
@@ -179,7 +179,7 @@ pub fn with_1_prop(
 pub fn with_2_props(
   component: ComponentBase(props, emits),
   props: #(Prop(p1), Prop(p2)),
-) -> ComponentBase(#(p1, p2), emits)
+) -> ComponentBase(#(Computed(p1), Computed(p2)), emits)
 
 /// Define 3 props on a component
 /// See `define_component` for a full example.
@@ -187,7 +187,7 @@ pub fn with_2_props(
 pub fn with_3_props(
   component: ComponentBase(props, emits),
   props: #(Prop(p1), Prop(p2), Prop(p3)),
-) -> ComponentBase(#(p1, p2, p3), emits)
+) -> ComponentBase(#(Computed(p1), Computed(p2), Computed(p3)), emits)
 
 /// Define 4 props on a component
 /// See `define_component` for a full example.
@@ -195,7 +195,10 @@ pub fn with_3_props(
 pub fn with_4_props(
   component: ComponentBase(props, emits),
   props: #(Prop(p1), Prop(p2), Prop(p3), Prop(p4)),
-) -> ComponentBase(#(p1, p2, p3, p4), emits)
+) -> ComponentBase(
+  #(Computed(p1), Computed(p2), Computed(p3), Computed(p4)),
+  emits,
+)
 
 /// Define 5 props on a component
 /// See `define_component` for a full example.
@@ -203,7 +206,10 @@ pub fn with_4_props(
 pub fn with_5_props(
   component: ComponentBase(props, emits),
   props: #(Prop(p1), Prop(p2), Prop(p3), Prop(p4), Prop(p5)),
-) -> ComponentBase(#(p1, p2, p3, p4, p5), emits)
+) -> ComponentBase(
+  #(Computed(p1), Computed(p2), Computed(p3), Computed(p4), Computed(p5)),
+  emits,
+)
 
 /// Define 6 props on a component
 /// See `define_component` for a full example.
@@ -211,7 +217,17 @@ pub fn with_5_props(
 pub fn with_6_props(
   component: ComponentBase(props, emits),
   props: #(Prop(p1), Prop(p2), Prop(p3), Prop(p4), Prop(p5), Prop(p6)),
-) -> ComponentBase(#(p1, p2, p3, p4, p5, p6), emits)
+) -> ComponentBase(
+  #(
+    Computed(p1),
+    Computed(p2),
+    Computed(p3),
+    Computed(p4),
+    Computed(p5),
+    Computed(p6),
+  ),
+  emits,
+)
 
 /// Define 7 props on a component
 /// See `define_component` for a full example.
@@ -219,7 +235,18 @@ pub fn with_6_props(
 pub fn with_7_props(
   component: ComponentBase(props, emits),
   props: #(Prop(p1), Prop(p2), Prop(p3), Prop(p4), Prop(p5), Prop(p6), Prop(p7)),
-) -> ComponentBase(#(p1, p2, p3, p4, p5, p6, p7), emits)
+) -> ComponentBase(
+  #(
+    Computed(p1),
+    Computed(p2),
+    Computed(p3),
+    Computed(p4),
+    Computed(p5),
+    Computed(p6),
+    Computed(p7),
+  ),
+  emits,
+)
 
 /// Define 8 props on a component
 /// See `define_component` for a full example.
@@ -236,7 +263,19 @@ pub fn with_8_props(
     Prop(p7),
     Prop(p8),
   ),
-) -> ComponentBase(#(p1, p2, p3, p4, p5, p6, p7, p8), emits)
+) -> ComponentBase(
+  #(
+    Computed(p1),
+    Computed(p2),
+    Computed(p3),
+    Computed(p4),
+    Computed(p5),
+    Computed(p6),
+    Computed(p7),
+    Computed(p8),
+  ),
+  emits,
+)
 
 /// Define 9 props on a component
 /// See `define_component` for a full example.
@@ -254,7 +293,20 @@ pub fn with_9_props(
     Prop(p8),
     Prop(p9),
   ),
-) -> ComponentBase(#(p1, p2, p3, p4, p5, p6, p7, p8, p9), emits)
+) -> ComponentBase(
+  #(
+    Computed(p1),
+    Computed(p2),
+    Computed(p3),
+    Computed(p4),
+    Computed(p5),
+    Computed(p6),
+    Computed(p7),
+    Computed(p8),
+    Computed(p9),
+  ),
+  emits,
+)
 
 // TODO: docs
 /// Define emits on a component
