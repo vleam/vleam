@@ -36,11 +36,12 @@
   "author": "Ofek Doitch",
   "license": "Apache-2.0",
   "devDependencies": {
+    "@types/node": "^20.12.12",
     "@vue/compiler-core": "^3.4.27",
     "@vue/compiler-dom": "^3.4.27",
     "cac": "^6.7.14",
     "picocolors": "^1.0.1",
-    "prettier": "^3.0.2",
+    "prettier": "^3.2.5",
     "tsup": "^8.0.2",
     "typescript": "^5.4.5"
   },

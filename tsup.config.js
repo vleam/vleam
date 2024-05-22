@@ -14,7 +14,7 @@ export default defineConfig({
     compilerOptions: {
       module: "es2022",
       moduleResolution: "node",
-      types: ["vite/client"],
+      types: ["vite/client", "node"],
     },
   },
 });
