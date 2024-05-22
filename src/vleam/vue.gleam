@@ -362,6 +362,7 @@ pub type Watchable(value) {
   NullableRef(watchable: NullableRef(value))
   NullableShallowRef(watchable: NullableShallowRef(value))
   Computed(watchable: Computed(value))
+  NullableComputed(watchable: NullableComputed(value))
   Function(watchable: fn() -> value)
   Plain(watchable: value)
 }
@@ -574,10 +575,10 @@ pub fn inject_with_default(key: String, default: value) -> value
 @external(javascript, "../ffi.mjs", "injectWithFactory")
 pub fn inject_with_factory(key: String, factory: fn() -> value) -> value
 
-// Nullable Refs
+// Nullables
 
 /// NullableRef auto (un)wraps Option
-/// This is a convenience to use with refs used in templates
+/// This is a convenience when using the ref in a template
 pub type NullableRef(value)
 
 @external(javascript, "../ffi.mjs", "nullableRef")
@@ -609,3 +610,15 @@ pub fn nullable_shallow_set(
   ref: NullableShallowRef(value),
   new_value: Option(value),
 ) -> NullableShallowRef(value)
+
+/// NullableComputed auto (un)wraps Option
+/// This is a convenience when using the computed in a template
+pub type NullableComputed(value)
+
+@external(javascript, "../ffi.mjs", "nullableComputed")
+pub fn nullable_computed(
+  callback: fn() -> Option(value),
+) -> NullableComputed(value)
+
+@external(javascript, "../ffi.mjs", "nullableValueGet")
+pub fn nullable_computed_value(ref: NullableComputed(value)) -> Option(value)

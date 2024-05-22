@@ -7,6 +7,8 @@
 - **BREAKING**: split `next_tick` to with/without callback for better ergonomics
 - **BREAKING**: make props reactive using `computed`
 - Add `inject` and `provide`
+- Fix `nullable_value`
+- Add `NullableComputed`
 
 ### Vite Plugin
 

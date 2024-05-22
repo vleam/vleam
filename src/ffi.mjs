@@ -100,6 +100,10 @@ export function refSet(ref, newValue) {
   return ref;
 }
 
+export function nullableComputed(callback) {
+  return vueComputed(() => unwrapOption(callback(), null));
+}
+
 export function nullableRef(option) {
   return vueRef(unwrapOption(option, null));
 }
@@ -109,12 +113,12 @@ export function nullableShallowRef(option) {
 }
 
 export function nullableValueGet(nullableReflike) {
-  nullableReflike.value ? new Some(nullableReflike.value) : new None();
+  return nullableReflike.value ? new Some(nullableReflike.value) : new None();
 }
 
-export function nullableValueSet(nullableReflife, newOption) {
-  nullableReflife.value = unwrapOption(newOption, null);
-  return nullableReflife;
+export function nullableValueSet(nullableReflike, newOption) {
+  nullableReflike.value = unwrapOption(newOption, null);
+  return nullableReflike;
 }
 
 export function watch(
