@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### General
+
+- Add a `prepare` lifecycle script to `package.json`
+
 ### FFI
 
 - **BREAKING**: split `next_tick` to with/without callback for better ergonomics

@@ -11,7 +11,8 @@
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch src",
-    "format": "prettier -w src"
+    "format": "prettier -w src",
+    "prepare": "tsup"
   },
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
