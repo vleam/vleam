@@ -2,6 +2,8 @@ import {
   watch as vueWatch,
   ref as vueRef,
   shallowRef as vueShallowRef,
+  inject as vueInject,
+  computed as vueComputed,
 } from "vue";
 
 import { Result, Ok, Error } from "./gleam.mjs";
@@ -134,4 +136,17 @@ export function watch(
       once: unwrapOption(once, undefined),
     },
   );
+}
+
+export function inject(key) {
+  const value = vueInject(key);
+  return value ? new Some(value) : new None();
+}
+
+export function injectWithDefault(key, defaultValue) {
+  return vueInject(key, defaultValue);
+}
+
+export function injectWithFactory(key, factory) {
+  return vueInject(key, factory, true);
 }

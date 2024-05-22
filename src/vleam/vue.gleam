@@ -505,6 +505,20 @@ pub fn on_activated(handler: fn() -> Nil) -> Nil
 @external(javascript, "vue", "onDeactivated")
 pub fn on_deactivated(handler: fn() -> Nil) -> Nil
 
+// Dependency Injection
+
+@external(javascript, "vue", "provide")
+pub fn provide(key: String, value: value) -> Nil
+
+@external(javascript, "../ffi.mjs", "inject")
+pub fn inject(key: String) -> Option(value)
+
+@external(javascript, "../ffi.mjs", "injectWithDefault")
+pub fn inject_with_default(key: String, default: value) -> value
+
+@external(javascript, "../ffi.mjs", "injectWithFactory")
+pub fn inject_with_factory(key: String, factory: fn() -> value) -> value
+
 // Nullable Refs
 
 /// NullableRef auto (un)wraps Option
