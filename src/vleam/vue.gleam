@@ -160,9 +160,9 @@ pub type Prop(value) {
 /// ```
 @external(javascript, "../ffi.mjs", "defineComponent")
 pub fn define_component(
-  components: List(#(String, fn() -> Component)),
-  directives: List(#(String, fn() -> Directive)),
-  inherit_attrs: Bool,
+  components components: List(#(String, fn() -> Component)),
+  directives directives: List(#(String, fn() -> Directive)),
+  inherit_attrs inherit_attrs: Bool,
 ) -> ComponentBase(Nil, Nil)
 
 /// Define 1 prop on a component

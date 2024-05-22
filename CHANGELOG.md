@@ -9,6 +9,7 @@
 - Add `inject` and `provide`
 - Fix `nullable_value`
 - Add `NullableComputed`
+- Add labels to `define_component`'s arguments
 
 ### Vite Plugin
 
