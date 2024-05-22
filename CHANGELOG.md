@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- **BREAKING**: split `next_tick` to with/without callback for better ergonomics
 - Add note to the readme about ignoring `vleam_generated`
 - Upgrade dependencies
 - Generate gleam files synchronously

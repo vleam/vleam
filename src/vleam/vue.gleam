@@ -34,7 +34,10 @@ pub fn register_component(
 /// vue.nextTick()
 /// https://vuejs.org/api/general.html#nexttick
 @external(javascript, "vue", "nextTick")
-pub fn next_tick(callback: Option(fn() -> Nil)) -> Promise(Nil)
+pub fn next_tick() -> Promise(Nil)
+
+@external(javascript, "vue", "nextTick")
+pub fn next_tick_action(callback: fn() -> Nil) -> Promise(Nil)
 
 // Setup
 
