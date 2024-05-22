@@ -10,6 +10,7 @@
 - Fix `nullable_value`
 - Add `NullableComputed`
 - Add labels to `define_component`'s arguments
+- Add initial `vue-router` FFI
 
 ### Vite Plugin
 
