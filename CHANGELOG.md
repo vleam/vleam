@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Vite Plugin
+
+- Transform `.gleam` in house. Solves `vite-gleam` race conditions
+
 ## v0.2.0
 
 ### General

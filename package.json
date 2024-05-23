@@ -54,7 +54,6 @@
     "rollup": "^4.18.0",
     "toml": "^3.0.0",
     "vite": "^5.2.11",
-    "vite-gleam": "^0.4.2",
     "vscode-jsonrpc": "^8.2.1",
     "vscode-languageclient": "^9.0.1",
     "vscode-uri": "^3.0.8",

@@ -11,7 +11,7 @@ import type {
   SFCScriptBlock,
 } from "@vue/compiler-sfc";
 import type { ElementNode } from "@vue/compiler-core";
-import { toGleamPath } from "./utils";
+import { toVleamGeneratedPath } from "./utils";
 
 import { URI } from "vscode-uri";
 import * as rpc from "vscode-jsonrpc/node.js";
@@ -119,8 +119,8 @@ async function transformIncomingMessage(message: rpc.Message) {
     const { gleamScriptBlock, errors } = getGleamScriptBlock(vueFileContent);
 
     if (gleamScriptBlock) {
-      const gleamFilePath = await toGleamPath(
-        path.join(process.cwd(), "src"),
+      const gleamFilePath = await toVleamGeneratedPath(
+        process.cwd(),
         vueFileUri.path,
       );
 

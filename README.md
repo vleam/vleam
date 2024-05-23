@@ -161,3 +161,7 @@ fn use_todo_input_event(event: InputEvent) -> Result(Todo, TodoError)
 #### `toRefs`, `reactive` support
 
 `toRefs` and `reactive` are not easy to translate into Gleam. Research required.
+
+### Thanks & Acknowledgements
+
+- [Enderchief/gleam-tools](gleam-tools/vite-gleam)
