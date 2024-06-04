@@ -180,11 +180,14 @@ HMR will trigger a full refresh until [gleam-lang/gleam#3178](https://github.com
 
 ### Sponsored by Nestful
 
-<p align="center">
-  <img src="nestful.png">
-</p>
+<a href="https://nestful.app">
+  <p align="center">
+    <img src="nestful.png">
+  </p>
+</a>
 
-Vleam is developed for and sponsored by Nestful.
+Vleam is developed for and sponsored by [Nestful](https://nestful.app), the best
+app there is to manage your own time.
 
 ### Thanks & Acknowledgements
 
