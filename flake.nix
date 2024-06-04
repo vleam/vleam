@@ -27,6 +27,10 @@
             nodejs
             pnpm
             yarn
+
+            typescript
+            nodePackages.typescript-language-server
+            nodePackages.volar
           ];
         };
       });

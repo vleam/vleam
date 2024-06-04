@@ -16,15 +16,15 @@ incorporate the Gleam programming language into their Vue projects.
 Similarly to how Typescript helped Javascript handle what considered a large
 application in 2016, Gleam can help with what's considered large today. Many
 apps already exists that are not going to be rewritten. No reason why they
-shouldn't benefit from useful innovations, especially if that benefit can be
-introduced slowly and incrementally, and if it means less Typescript.
+shouldn't benefit from useful innovations, especially when they can be
+introduced slowly and incrementally, and particularly if it means less Typescript.
 
 Vleam consists of the following parts:
 
 1. A Vite plugin that:
 
 - Allows the use of `<script lang="gleam">` in Vue's SFC
-- Loads [vite-gleam](https://github.com/Enderchief/gleam-tools/tree/master/packages/vite-gleam) to import gleam files in JS/TS
+- Allows improting `.gleam` files in Javascript/Typescript.
 
 2. A set of bindings to Vue's APIs.
 
@@ -71,7 +71,7 @@ Add `src/vleam_generated` to `.gitignore`.
 
 For Neovim support, install [vleam.nvim](https://github.com/vleam/vleam.nvim).
 
-For VSCode support, install the vleam plugin.
+For VSCode support, install the [vleam plugin](https://github.com/vleam/vscode-vleam).
 
 If you'd like to get type information for Gleam code imported in Typescript,
 install `ts-gleam` as well:
@@ -109,19 +109,31 @@ import vleam/vue.{type Component, Prop, define_component, setup, with_1_prop}
 pub fn default_export() -> Component {
   define_component([], [], False)
   |> with_1_prop(#(Prop("initialCount", Some(0))))
-  |> setup(fn(props: #(Int), _) {
-    let counter = vue.shallow_ref(props.0)
+  // Props are handed as Computed to stay reactive
+  |> setup(fn(props: #(Computed(Int)), _) {
+    let initial_count = props.0
+
+    let counter =
+      initial_count
+      |> vue.computed_value
+      |> vue.ref
 
     let increment = fn() -> Int {
-      let current_count = vue.shallow_ref_value(counter)
+      let current_count =
+        counter
+        |> vue.ref_value
 
       counter
-      |> vue.shallow_ref_set(current_count)
+      |> vue.ref_set(current_count)
 
       current_count
     }
 
-    #(#("counter", counter), #("increment", increment))
+    // returning an Error will cause `setup` to throw it
+    Ok(#(
+      #("counter", counter),
+      #("increment", increment),
+    ))
   })
 }
 ```
@@ -145,7 +157,7 @@ https://hexdocs.pm/vleam
 fn use_todo_input_event(event: InputEvent) -> Result(Todo, TodoError)
 
 // Pain
-@external(javascript, "/../../../../composables/useTodoInputEvent", "useTodoInputEvent")
+@external(javascript, "../../../../composables/useTodoInputEvent", "useTodoInputEvent")
 fn use_todo_input_event(event: InputEvent) -> Result(Todo, TodoError)
 ```
 
@@ -157,6 +169,10 @@ fn use_todo_input_event(event: InputEvent) -> Result(Todo, TodoError)
   browser console for more information.
 
 ### Limitations
+
+#### HMR
+
+HMR will trigger a full refresh until [gleam-lang/gleam#3178](https://github.com/gleam-lang/gleam/issues/3178) is fixed.
 
 #### `toRefs`, `reactive` support
 

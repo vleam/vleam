@@ -60,12 +60,12 @@ pub type Prop(value) {
 /// 1. Using `@external` to refer to a component defined in Javascript
 /// 2. Importing a component defined in Gleam using this library
 /// 3. Using them without the need to refer them in `define_component`, either
-///    by defining them globally `vue.component` or by an auto-import mechanism
+///    by gloabl definition with `vue.component` or by an auto-import mechanism
 ///    similar to Nuxt's
 ///
 /// `directives` is a list of #(directive_name, fn() -> Directive) tuples.
 ///
-/// `inherit_attrs` is a boolean the same as Vue's javascript configuration.
+/// `inherit_attrs` is a boolean, identical to Vue's javascript configuration.
 ///
 /// ## Example
 ///
@@ -109,52 +109,64 @@ pub type Prop(value) {
 ///     // Default value, therefore optional
 ///     Prop("greeting", Some("Hello, ")),
 ///   ))
-///   // It's best practice to always type the props, as types are only inferred if
-///   // there's a default value.
-///   |> setup(fn(props: #(String, String), _) {
+///   // Props are handed as Computed for reactivity. It's best practice to
+///   // always type them, as types are only inferred if there's a default value.
+///   |> setup(fn(props: #(Computed(String), Computed(String)), _) {
 ///     let initial_name = props.0
 ///     let greeting = props.1
-///     case string.length(greeting) > 0 {
-///       True -> {
-///         let change_count = vue.shallow_ref(0)
-///         let increment_count = fn() {
-///           change_count
-///           |> vue.shallow_ref_set(vue.shallow_ref_value(change_count) + 1)
-///         }
-///         let name = vue.shallow_ref(initial_name)
-///         let change_name = fn(new_name) {
-///           name
-///           |> vue.shallow_ref_set(new_name)
-///         }
-///         let full_greeting =
-///           vue.computed(fn() {
-///             name
-///             |> vue.shallow_ref_value
-///             |> string.append(greeting)
-/// 
-///             increment_count()
-///           })
-/// 
-///         // To return values to the template, the FFI expects an Ok() with a
-///         // tuple of object entires tuples. The following is identical to Vue's:
-///         //
-///         // return {
-///         //   fullGreeting: full_greeting,
-///         //   changeName: change_name,
-///         // };
-///         Ok(
-///           #(#("fullGreeting", full_greeting), #("changeName", change_name), #(
-///             "changeCount",
-///             change_count,
-///           )),
-///         )
+///
+///     // Errors are thrown. This is just a demo, don't throw on bad input,
+///     // only on irrecoverable errors.
+///     use <- bool.guard(
+///       {
+///         greeting
+///         |> vue.computed_value
+///         |> string.length
 ///       }
-///       False -> {
-///         // Errors are thrown. This is just a demo, don't throw on bad input,
-///         // only on irrecoverable errors.
-///         Error("Empty greeting")
-///       }
+///       > 0,
+///       Error("Empty greeting"),
+///     )
+///
+///     let change_count = vue.shallow_ref(0)
+///     let increment_count = fn() {
+///       change_count
+///       |> vue.shallow_ref_set(vue.shallow_ref_value(change_count) + 1)
 ///     }
+///
+///     let name =
+///       initial_name
+///       |> vue.computed_value
+///       |> vue.shallow_ref
+///
+///     let change_name = fn(new_name) {
+///       name
+///       |> vue.shallow_ref_set(new_name)
+///     }
+///     let full_greeting =
+///       vue.computed(fn() {
+///         name
+///         |> vue.shallow_ref_value
+///         |> string.append(
+///           greeting
+///           |> vue.computed_value
+///         )
+/// 
+///         increment_count()
+///       })
+///
+///     // To return values to the template, the FFI expects an Ok() with a
+///     // tuple of object entires tuples. The following is identical to Vue's:
+///     //
+///     // return {
+///     //   fullGreeting: full_greeting,
+///     //   changeName: change_name,
+///     //   changeCount: change_count,
+///     // };
+///     Ok(#(
+///       #("fullGreeting", full_greeting),
+///       #("changeName", change_name),
+///       #("changeCount", change_count),
+///     ))
 ///   })
 /// }
 /// ```
@@ -369,100 +381,100 @@ pub type Watchable(value) {
 
 @external(javascript, "../ffi.mjs", "watch")
 pub fn watch1_with_options(
-  reflikes: #(Watchable(a)),
-  callback: fn(a, a, Option(fn(fn() -> Nil) -> Nil)) -> Nil,
-  immediate: Option(Bool),
-  deep: Option(Bool),
-  flush: Option(String),
-  on_track: Option(fn(DebuggerEvent) -> Nil),
-  on_trigger: Option(fn(DebuggerEvent) -> Nil),
-  once: Option(Bool),
+  reflikes reflikes: #(Watchable(a)),
+  callback callback: fn(a, a, Option(fn(fn() -> Nil) -> Nil)) -> Nil,
+  immediate immediate: Option(Bool),
+  deep deep: Option(Bool),
+  flush flush: Option(String),
+  on_track on_track: Option(fn(DebuggerEvent) -> Nil),
+  on_trigger on_trigger: Option(fn(DebuggerEvent) -> Nil),
+  once once: Option(Bool),
 ) -> Nil
 
 @external(javascript, "../ffi.mjs", "watch")
 pub fn watch2_with_options(
-  reflikes: #(Watchable(a), Watchable(b)),
-  callback: fn(
+  reflikes reflikes: #(Watchable(a), Watchable(b)),
+  callback callback: fn(
     #(Watchable(a), Watchable(b)),
     #(Watchable(a), Watchable(b)),
     Option(fn(fn() -> Nil) -> Nil),
   ) ->
     Nil,
-  immediate: Option(Bool),
-  deep: Option(Bool),
-  flush: Option(String),
-  on_track: Option(fn(DebuggerEvent) -> Nil),
-  on_trigger: Option(fn(DebuggerEvent) -> Nil),
-  once: Option(Bool),
+  immediate immediate: Option(Bool),
+  deep deep: Option(Bool),
+  flush flush: Option(String),
+  on_track on_track: Option(fn(DebuggerEvent) -> Nil),
+  on_trigger on_trigger: Option(fn(DebuggerEvent) -> Nil),
+  once once: Option(Bool),
 ) -> Nil
 
 @external(javascript, "../ffi.mjs", "watch")
 pub fn watch3_with_options(
-  reflikes: #(Watchable(a), Watchable(b), Watchable(c)),
-  callback: fn(
+  reflikes reflikes: #(Watchable(a), Watchable(b), Watchable(c)),
+  callback callback: fn(
     #(Watchable(a), Watchable(b), Watchable(c)),
     #(Watchable(a), Watchable(b), Watchable(c)),
     Option(fn(fn() -> Nil) -> Nil),
   ) ->
     Nil,
-  immediate: Option(Bool),
-  deep: Option(Bool),
-  flush: Option(String),
-  on_track: Option(fn(DebuggerEvent) -> Nil),
-  on_trigger: Option(fn(DebuggerEvent) -> Nil),
-  once: Option(Bool),
+  immediate immediate: Option(Bool),
+  deep deep: Option(Bool),
+  flush flush: Option(String),
+  on_track on_track: Option(fn(DebuggerEvent) -> Nil),
+  on_trigger on_trigger: Option(fn(DebuggerEvent) -> Nil),
+  once once: Option(Bool),
 ) -> Nil
 
 @external(javascript, "../ffi.mjs", "watch")
 pub fn watch4_with_options(
-  reflikes: #(Watchable(a), Watchable(b), Watchable(c), Watchable(d)),
-  callback: fn(
+  reflikes reflikes: #(Watchable(a), Watchable(b), Watchable(c), Watchable(d)),
+  callback callback: fn(
     #(Watchable(a), Watchable(b), Watchable(c), Watchable(d)),
     #(Watchable(a), Watchable(b), Watchable(c), Watchable(d)),
     Option(fn(fn() -> Nil) -> Nil),
   ) ->
     Nil,
-  immediate: Option(Bool),
-  deep: Option(Bool),
-  flush: Option(String),
-  on_track: Option(fn(DebuggerEvent) -> Nil),
-  on_trigger: Option(fn(DebuggerEvent) -> Nil),
-  once: Option(Bool),
+  immediate immediate: Option(Bool),
+  deep deep: Option(Bool),
+  flush flush: Option(String),
+  on_track on_track: Option(fn(DebuggerEvent) -> Nil),
+  on_trigger on_trigger: Option(fn(DebuggerEvent) -> Nil),
+  once once: Option(Bool),
 ) -> Nil
 
 @external(javascript, "../ffi.mjs", "watch")
 pub fn watch5_with_options(
-  reflikes: #(
+  reflikes reflikes: #(
     Watchable(a),
     Watchable(b),
     Watchable(c),
     Watchable(d),
     Watchable(e),
   ),
-  callback: fn(
+  callback callback: fn(
     #(Watchable(a), Watchable(b), Watchable(c), Watchable(d), Watchable(e)),
     #(Watchable(a), Watchable(b), Watchable(c), Watchable(d), Watchable(e)),
     Option(fn(fn() -> Nil) -> Nil),
   ) ->
     Nil,
-  immediate: Option(Bool),
-  deep: Option(Bool),
-  flush: Option(String),
-  on_track: Option(fn(DebuggerEvent) -> Nil),
-  on_trigger: Option(fn(DebuggerEvent) -> Nil),
-  once: Option(Bool),
+  immediate immediate: Option(Bool),
+  deep deep: Option(Bool),
+  flush flush: Option(String),
+  on_track on_track: Option(fn(DebuggerEvent) -> Nil),
+  on_trigger on_trigger: Option(fn(DebuggerEvent) -> Nil),
+  once once: Option(Bool),
 ) -> Nil
 
 pub fn watch1(
-  reflikes: #(Watchable(a)),
-  callback: fn(a, a, Option(fn(fn() -> Nil) -> Nil)) -> Nil,
+  reflikes reflikes: #(Watchable(a)),
+  callback callback: fn(a, a, Option(fn(fn() -> Nil) -> Nil)) -> Nil,
 ) -> Nil {
   watch1_with_options(reflikes, callback, None, None, None, None, None, None)
 }
 
 pub fn watch2(
-  reflikes: #(Watchable(a), Watchable(b)),
-  callback: fn(
+  reflikes reflikes: #(Watchable(a), Watchable(b)),
+  callback callback: fn(
     #(Watchable(a), Watchable(b)),
     #(Watchable(a), Watchable(b)),
     Option(fn(fn() -> Nil) -> Nil),
@@ -473,8 +485,8 @@ pub fn watch2(
 }
 
 pub fn watch3(
-  reflikes: #(Watchable(a), Watchable(b), Watchable(c)),
-  callback: fn(
+  reflikes reflikes: #(Watchable(a), Watchable(b), Watchable(c)),
+  callback callback: fn(
     #(Watchable(a), Watchable(b), Watchable(c)),
     #(Watchable(a), Watchable(b), Watchable(c)),
     Option(fn(fn() -> Nil) -> Nil),
@@ -485,8 +497,8 @@ pub fn watch3(
 }
 
 pub fn watch4(
-  reflikes: #(Watchable(a), Watchable(b), Watchable(c), Watchable(d)),
-  callback: fn(
+  reflikes reflikes: #(Watchable(a), Watchable(b), Watchable(c), Watchable(d)),
+  callback callback: fn(
     #(Watchable(a), Watchable(b), Watchable(c), Watchable(d)),
     #(Watchable(a), Watchable(b), Watchable(c), Watchable(d)),
     Option(fn(fn() -> Nil) -> Nil),
@@ -497,14 +509,14 @@ pub fn watch4(
 }
 
 pub fn watch5(
-  reflikes: #(
+  reflikes reflikes: #(
     Watchable(a),
     Watchable(b),
     Watchable(c),
     Watchable(d),
     Watchable(e),
   ),
-  callback: fn(
+  callback callback: fn(
     #(Watchable(a), Watchable(b), Watchable(c), Watchable(d), Watchable(e)),
     #(Watchable(a), Watchable(b), Watchable(c), Watchable(d), Watchable(e)),
     Option(fn(fn() -> Nil) -> Nil),
@@ -578,7 +590,7 @@ pub fn inject_with_factory(key: String, factory: fn() -> value) -> value
 // Nullables
 
 /// NullableRef auto (un)wraps Option
-/// This is a convenience when using the ref in a template
+/// This is a convenience for using Ref(Option) in a template
 pub type NullableRef(value)
 
 @external(javascript, "../ffi.mjs", "nullableRef")
@@ -612,7 +624,7 @@ pub fn nullable_shallow_set(
 ) -> NullableShallowRef(value)
 
 /// NullableComputed auto (un)wraps Option
-/// This is a convenience when using the computed in a template
+/// This is a convenience for using Computed(Option) in a template
 pub type NullableComputed(value)
 
 @external(javascript, "../ffi.mjs", "nullableComputed")
