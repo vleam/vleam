@@ -1,5 +1,7 @@
 <script lang="gleam">
+import gleam/bool
 import gleam/dict
+import gleam/int
 import gleam/list
 import gleam/option.{None, Some}
 import gleam/string
@@ -10,14 +12,15 @@ import vleam/vue.{
 
 import vleam_todo/models.{type Todo, Todo, new_todo}
 
-@external(javascript, "/src/composables/useLocalTodos", "useLocalTodos")
+@external(javascript, "/src/composables/useStoredTodos", "useStoredTodos")
 fn use_local_todos() -> vue.Ref(List(Todo))
 
-@external(javascript, "/src/components/HelloWorld.vue", "default")
-fn hello_world_component() -> Component
+// Sample external component
+@external(javascript, "/src/components/Title.vue", "default")
+fn title_component() -> Component
 
 pub fn default_export() -> Component {
-  define_component([#("HelloWorld", hello_world_component)], [], False)
+  define_component([#("Title", title_component)], [], False)
   |> setup(fn(_, _) {
     let todos_list: vue.Ref(List(Todo)) = use_local_todos()
     let todos_dict: vue.ShallowRef(dict.Dict(Int, Todo)) =
@@ -27,24 +30,58 @@ pub fn default_export() -> Component {
       |> dict.from_list
       |> vue.shallow_ref
 
-    watch1(#(vue.ShallowRef(todos_dict)), fn(_, new_val, _) {
+    watch1(#(vue.ShallowRef(todos_dict)), fn(_, _, _) {
       todos_list
       |> ref_set(
-        new_val
+        todos_dict
+        |> vue.shallow_ref_value
         |> dict.values,
       )
 
       Nil
     })
 
-    let toggle_all = fn(value: Bool) {
+    let remaining =
+      vue.computed(fn() {
+        todos_list
+        |> vue.ref_value
+        |> list.map(fn(todo_item) {
+          !todo_item.completed
+          |> bool.to_int
+        })
+        |> int.sum
+      })
+
+    let toggle_all = fn() {
+      let toggle_to =
+        remaining
+        |> vue.computed_value
+        != 0
+
       let toggled_todos =
         todos_dict
         |> shallow_ref_value
-        |> dict.map_values(fn(_, t) { Todo(..t, completed: value) })
+        |> dict.map_values(fn(_, t) { Todo(..t, completed: toggle_to) })
 
       todos_dict
       |> shallow_ref_set(toggled_todos)
+    }
+
+    let new_title_draft = vue.ref("")
+
+    let add_todo = fn(new_title: String) {
+      let new_todo = models.new_todo(new_title)
+
+      let new_todos =
+        todos_dict
+        |> shallow_ref_value
+        |> dict.insert(new_todo.id, new_todo)
+
+      todos_dict
+      |> shallow_ref_set(new_todos)
+
+      new_title_draft
+      |> ref_set("")
     }
 
     let remove_todo = fn(target: Todo) {
@@ -58,26 +95,31 @@ pub fn default_export() -> Component {
     }
 
     let todo_id_to_edit = vue.ref(-1)
-    let todo_edited_title = vue.ref("")
+    let edited_title_draft = vue.ref("")
 
-    let edit_todo = fn(id: Int) {
-      todo_edited_title
-      |> ref_set("")
+    let edit_todo = fn(todo_to_edit: Todo) {
+      edited_title_draft
+      |> ref_set(todo_to_edit.title)
 
       todo_id_to_edit
-      |> ref_set(id)
+      |> ref_set(todo_to_edit.id)
     }
 
     let reset_edit = fn() {
       todo_id_to_edit
       |> ref_set(-1)
 
-      todo_edited_title
+      edited_title_draft
       |> ref_set("")
     }
 
     let done_edit = fn() {
-      let new_todos = case string.length(ref_value(todo_edited_title)) > 0 {
+      let new_todos = case
+        edited_title_draft
+        |> ref_value
+        |> string.length
+        > 0
+      {
         True -> {
           todos_dict
           |> shallow_ref_value
@@ -86,8 +128,8 @@ pub fn default_export() -> Component {
               |> ref_value,
             fn(maybe_t) {
               case maybe_t {
-                Some(t) -> Todo(..t, title: ref_value(todo_edited_title))
-                None -> new_todo(ref_value(todo_edited_title))
+                Some(t) -> Todo(..t, title: ref_value(edited_title_draft))
+                None -> new_todo(ref_value(edited_title_draft))
               }
             },
           )
@@ -118,15 +160,24 @@ pub fn default_export() -> Component {
       |> shallow_ref_set(new_todos)
     }
 
+    let visibility = vue.ref("all")
+
     Ok(#(
       #("removeCompleted", remove_completed),
       #("toggleAll", toggle_all),
+      #("addTodo", add_todo),
       #("removeTodo", remove_todo),
+      #("idToEdit", todo_id_to_edit),
+      #("editedTitleDraft", edited_title_draft),
       #("editTodo", edit_todo),
       #("cancelEdit", reset_edit),
       #("doneEdit", done_edit),
+      #("todos", todos_list),
       // TODO: implement filters
       #("filteredTodos", todos_list),
+      #("visibility", visibility),
+      #("remaining", remaining),
+      #("newTitleDraft", new_title_draft),
     ))
   })
 }
@@ -141,29 +192,34 @@ minimally changed template in an existing codebase
 <template>
   <section class="todoapp">
     <header class="header">
-      <h1>todos</h1>
+      <h1><Title /></h1>
       <input
+        v-model="newTitleDraft"
         class="new-todo"
         autofocus
         placeholder="What needs to be done?"
-        @keyup.enter="addTodo"
+        @keyup.enter="
+          () => {
+            addTodo(newTitleDraft)
+          }
+        "
       />
     </header>
-    <section class="main" v-show="todos.length">
+    <section class="main" v-show="todos.toArray().length">
       <input
         id="toggle-all"
         class="toggle-all"
         type="checkbox"
         :checked="remaining === 0"
-        @change="toggleAll"
+        @change="() => toggleAll()"
       />
       <label for="toggle-all">Mark all as complete</label>
       <ul class="todo-list">
         <li
-          v-for="todo in filteredTodos"
+          v-for="todo in filteredTodos.toArray()"
           class="todo"
           :key="todo.id"
-          :class="{ completed: todo.completed, editing: todo === editedTodo }"
+          :class="{ completed: todo.completed, editing: todo.id === idToEdit }"
         >
           <div class="view">
             <input class="toggle" type="checkbox" v-model="todo.completed" />
@@ -171,10 +227,10 @@ minimally changed template in an existing codebase
             <button class="destroy" @click="removeTodo(todo)"></button>
           </div>
           <input
-            v-if="todo === editedTodo"
+            v-if="todo.id === idToEdit"
             class="edit"
             type="text"
-            v-model="todo.title"
+            v-model="editedTitleDraft"
             @vue:mounted="({ el }) => el.focus()"
             @blur="doneEdit(todo)"
             @keyup.enter="doneEdit(todo)"

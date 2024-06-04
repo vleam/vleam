@@ -1,9 +1,8 @@
 import { fileURLToPath, URL } from 'node:url'
 
-import { defineConfig, Plugin } from 'vite'
+import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import VueDevTools from 'vite-plugin-vue-devtools'
-import Inspect from 'vite-plugin-inspect'
 
 import { vitePluginVueVleam } from 'vleam'
 
@@ -12,8 +11,7 @@ export default defineConfig({
   plugins: [vitePluginVueVleam(), vue(), VueDevTools()],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-      '@gleam-build': fileURLToPath(new URL('./build/dev/javascript', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url))
     }
   }
 })

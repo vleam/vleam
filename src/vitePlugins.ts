@@ -67,7 +67,7 @@ export async function vitePluginVueVleam(): Promise<Plugin> {
     },
     async handleHotUpdate({ modules, server, file }) {
       if (modules.some(({ info }) => info?.meta?.vueGleam?.isGleamScript)) {
-        server.hot.send({
+        server.ws.send({
           type: "full-reload",
         });
         return [];
