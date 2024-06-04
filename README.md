@@ -4,7 +4,7 @@
 
 ### **THIS IS EXPERIMENTAL SOFTWARE**.
 
-You know where not to use it.
+It can be used in production, but may cause headaches to the developer.
 
 # Vleam
 
@@ -177,6 +177,14 @@ HMR will trigger a full refresh until [gleam-lang/gleam#3178](https://github.com
 #### `toRefs`, `reactive` support
 
 `toRefs` and `reactive` are not easy to translate into Gleam. Research required.
+
+### Sponsored by Nestful
+
+<p align="center">
+  <img src="logo.png">
+</p>
+
+Vleam is developed for and sponsored by Nestful.
 
 ### Thanks & Acknowledgements
 
