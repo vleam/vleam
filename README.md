@@ -181,7 +181,7 @@ HMR will trigger a full refresh until [gleam-lang/gleam#3178](https://github.com
 ### Sponsored by Nestful
 
 <p align="center">
-  <img src="logo.png">
+  <img src="nestful.png">
 </p>
 
 Vleam is developed for and sponsored by Nestful.
