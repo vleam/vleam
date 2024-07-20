@@ -6,10 +6,8 @@
   outputs = { self, nixpkgs }:
     let
       overlays = [
-        (final: prev: rec {
+        (final: prev: {
           nodejs = prev.nodejs_latest;
-          pnpm = prev.nodePackages.pnpm;
-          yarn = (prev.yarn.override { inherit nodejs; });
         })
       ];
       supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
@@ -26,7 +24,6 @@
             node2nix
             nodejs
             pnpm
-            yarn
 
             typescript
             nodePackages.typescript-language-server
