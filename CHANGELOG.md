@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.3.1
+
+### Vite Plugin
+
+- Fix path of generated Gleam files
+
 ## v0.3.0
 
 ### Vite Plugin

@@ -20,7 +20,9 @@ export async function toVleamGeneratedPath(
   vuePath: string,
 ): Promise<string> {
   const srcPath = path.join(projectRoot, SRC_DIR);
-  const relativeModulePath = path.relative(srcPath, path.dirname(vuePath));
+  const relativeModulePath = path
+    .relative(srcPath, path.dirname(vuePath))
+    .toLowerCase();
   const moduleFileName = path
     .basename(vuePath)
     .toLowerCase()
