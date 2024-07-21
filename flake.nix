@@ -27,7 +27,7 @@
 
             typescript
             nodePackages.typescript-language-server
-            nodePackages.volar
+            vue-language-server
           ];
         };
       });
