@@ -1,9 +1,8 @@
 import {
   watch as vueWatch,
-  ref as vueRef,
-  shallowRef as vueShallowRef,
   inject as vueInject,
   computed as vueComputed,
+  isRef,
 } from "vue";
 
 import { Result, Ok, Error } from "./gleam.mjs";
@@ -37,20 +36,26 @@ export function defineComponent(components, directives, inheritAttrs) {
   };
 }
 
-export function addProps(componentBase, props) {
-  componentBase.props = Object.fromEntries(
-    props.map((prop, position) => {
-      const maybeDefault = unwrapOption(prop.default, undefined);
-      return [
-        prop.name,
-        {
-          default: maybeDefault,
-          required: maybeDefault === undefined,
-          position,
-        },
-      ];
-    }),
-  );
+export function addProps(componentBase, ...props) {
+  componentBase.props = {
+    ...componentBase.props,
+    ...Object.fromEntries(
+      props.map((prop, position) => {
+        const nullable = prop.default === undefined || prop.default === null;
+        const maybeDefault = unwrapOption(prop.default, undefined);
+        const required = !nullable && maybeDefault === undefined;
+        return [
+          prop.name,
+          {
+            default: maybeDefault,
+            required,
+            position,
+            nullable,
+          },
+        ];
+      }),
+    ),
+  };
   return componentBase;
 }
 
@@ -63,24 +68,64 @@ function isOption(maybeOption) {
   return maybeOption instanceof Some || maybeOption instanceof None;
 }
 
+function isResult(maybeResult) {
+  return maybeResult instanceof Result;
+}
+
+function makeTemplateFriendly(value, isNestedProxy) {
+  if (value === null) {
+    return value;
+  } else if (isOption(value)) {
+    return unwrapOption(value, null);
+  } else if (typeof value === "object" && !isNestedProxy) {
+    return new Proxy(value, {
+      get(target, key, receiver) {
+        const val = Reflect.get(target, key, receiver);
+        return makeTemplateFriendly(val, true);
+      },
+    });
+  } else if (typeof value === "function") {
+    return (...args) => makeTemplateFriendly(value(...args));
+  } else {
+    return value;
+  }
+}
+
 export function addSetup(componentBase, setup) {
   componentBase.setup = (props, { emits }) => {
-    const computedProps =
+    const computedNonNullableProps =
       componentBase.props &&
       Object.entries(componentBase.props)
+        .filter(([, prop]) => !prop.nullable)
         .sort((a, b) => a[1].position - b[1].position)
         .map(([name]) => vueComputed(() => props[name]));
 
+    const computedNullabledProps =
+      componentBase.props &&
+      Object.entries(componentBase.props)
+        .filter(([, prop]) => prop.nullable)
+        .sort((a, b) => a[1].position - b[1].position)
+        .map(([name]) =>
+          vueComputed(() =>
+            isOption(props[name])
+              ? props[name]
+              : props[name]
+                ? new Some(props[name])
+                : new None(),
+          ),
+        );
+
     const result = setup(
-      computedProps,
+      computedNonNullableProps,
+      computedNullabledProps,
       componentBase.emits?.map((name) => (data) => emits(name, data)),
     );
 
-    if (result instanceof Result && isOk(result)) {
+    if (isResult(result) && isOk(result)) {
       const resultObject = Object.fromEntries(
         unwrapOk(result, []).map(([name, value]) => [
           name,
-          isOption(value) ? unwrapOption(value, null) : value,
+          makeTemplateFriendly(value),
         ]),
       );
       return resultObject;
@@ -98,27 +143,6 @@ export function reflikeValue(reflike) {
 export function refSet(ref, newValue) {
   ref.value = newValue;
   return ref;
-}
-
-export function nullableComputed(callback) {
-  return vueComputed(() => unwrapOption(callback(), null));
-}
-
-export function nullableRef(option) {
-  return vueRef(unwrapOption(option, null));
-}
-
-export function nullableShallowRef(option) {
-  return vueShallowRef(unwrapOption(option, null));
-}
-
-export function nullableValueGet(nullableReflike) {
-  return nullableReflike.value ? new Some(nullableReflike.value) : new None();
-}
-
-export function nullableValueSet(nullableReflike, newOption) {
-  nullableReflike.value = unwrapOption(newOption, null);
-  return nullableReflike;
 }
 
 export function watch(

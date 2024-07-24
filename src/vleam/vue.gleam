@@ -43,7 +43,7 @@ pub fn next_tick_action(callback: fn() -> Nil) -> Promise(Nil)
 
 /// An incomplete component representation piped during component definition.
 /// See `define_component` for a full example.
-pub type ComponentBase(props, emits)
+pub type ComponentBase(required_props, nullable_props, emits)
 
 /// Prop record to be used on component definition.
 /// See `define_component` for a full example.
@@ -51,8 +51,15 @@ pub type Prop(value) {
   Prop(name: String, default: Option(value))
 }
 
-/// Entrypoint for component definition. optionally piped to a `with_n_props`
-/// and/or `with_emits` functions, and must be finally piped to `setup`.
+/// NullableProp record to be used on component definition.
+/// See `define_component` for a full example.
+pub type NullableProp(value) {
+  NullableProp(name: String)
+}
+
+/// Entrypoint for component definition. optionally piped to a
+/// `with_n_props` and/or `with_n_nullable_props` and/or `with_emits`
+/// functions, and must be finally piped to `setup`.
 ///
 /// `components` is a list of #(component_name, fn() -> Component) tuples. There
 /// are three possible ways to gain access to components:
@@ -73,7 +80,8 @@ pub type Prop(value) {
 /// import gleam/option.{None, Some}
 /// import gleam/string
 /// import vleam/vue.{
-///   type Component, Prop, define_component, setup, with_2_props,
+///   type Component, NullableProp, Prop, define_component, setup,
+///   with_1_nullable_prop, with_1_prop,
 /// }
 /// 
 /// import vleam_todo/models.{type Todo, type TodoError}
@@ -103,15 +111,19 @@ pub type Prop(value) {
 ///     [],
 ///     False,
 ///   )
-///   |> with_2_props(#(
-///     // No default value, therefore mandatory
+///   |> with_1_prop(
 ///     Prop("initialName", None),
-///     // Default value, therefore optional
+///   )
+///   |> with_1_nullable_prop(
 ///     Prop("greeting", Some("Hello, ")),
-///   ))
+///   )
 ///   // Props are handed as Computed for reactivity. It's best practice to
 ///   // always type them, as types are only inferred if there's a default value.
-///   |> setup(fn(props: #(Computed(String), Computed(String)), _) {
+///   |> setup(fn(
+///     required_props: #(Computed(String)),
+///     nullable_props: #(Computed(String)),
+///     _
+///   ) {
 ///     let initial_name = props.0
 ///     let greeting = props.1
 ///
@@ -175,40 +187,106 @@ pub fn define_component(
   components components: List(#(String, fn() -> Component)),
   directives directives: List(#(String, fn() -> Directive)),
   inherit_attrs inherit_attrs: Bool,
-) -> ComponentBase(Nil, Nil)
+) -> ComponentBase(Nil, Nil, Nil)
 
 /// Define 1 prop on a component
 /// See `define_component` for a full example.
 @external(javascript, "../ffi.mjs", "addProps")
 pub fn with_1_prop(
-  component: ComponentBase(props, emits),
-  props: #(Prop(p1)),
-) -> ComponentBase(#(Computed(p1)), emits)
+  component: ComponentBase(required_props, nullable_props, emits),
+  prop_1: Prop(p1),
+) -> ComponentBase(#(Computed(p1)), nullable_props, emits)
+
+/// Define 1 prop on a component
+/// See `define_component` for a full example.
+@external(javascript, "../ffi.mjs", "addProps")
+pub fn with_1_nullable_prop(
+  component: ComponentBase(required_props, nullable_props, emits),
+  prop_1: NullableProp(p1),
+) -> ComponentBase(required_props, #(Computed(Option(p1))), emits)
 
 /// Define 2 props on a component
 /// See `define_component` for a full example.
 @external(javascript, "../ffi.mjs", "addProps")
 pub fn with_2_props(
-  component: ComponentBase(props, emits),
-  props: #(Prop(p1), Prop(p2)),
-) -> ComponentBase(#(Computed(p1), Computed(p2)), emits)
+  component: ComponentBase(required_props, nullable_props, emits),
+  prop_1: Prop(p1),
+  prop_2: Prop(p2),
+) -> ComponentBase(#(Computed(p1), Computed(p2)), nullable_props, emits)
+
+/// Define 2 props on a component
+/// See `define_component` for a full example.
+@external(javascript, "../ffi.mjs", "addProps")
+pub fn with_2_nullable_props(
+  component: ComponentBase(required_props, nullable_props, emits),
+  prop_1: NullableProp(p1),
+  prop_2: NullableProp(p2),
+) -> ComponentBase(
+  required_props,
+  #(Computed(Option(p1)), Computed(Option(p2))),
+  emits,
+)
 
 /// Define 3 props on a component
 /// See `define_component` for a full example.
 @external(javascript, "../ffi.mjs", "addProps")
 pub fn with_3_props(
-  component: ComponentBase(props, emits),
-  props: #(Prop(p1), Prop(p2), Prop(p3)),
-) -> ComponentBase(#(Computed(p1), Computed(p2), Computed(p3)), emits)
+  component: ComponentBase(required_props, nullable_props, emits),
+  prop_1: Prop(p1),
+  prop_2: Prop(p2),
+  prop_3: Prop(p3),
+) -> ComponentBase(
+  #(Computed(p1), Computed(p2), Computed(p3)),
+  nullable_props,
+  emits,
+)
+
+/// Define 3 props on a component
+/// See `define_component` for a full example.
+@external(javascript, "../ffi.mjs", "addProps")
+pub fn with_3_nullable_props(
+  component: ComponentBase(required_props, nullable_props, emits),
+  prop_1: NullableProp(p1),
+  prop_2: NullableProp(p2),
+  prop_3: NullableProp(p3),
+) -> ComponentBase(
+  required_props,
+  #(Computed(Option(p1)), Computed(Option(p2)), Computed(Option(p3))),
+  emits,
+)
 
 /// Define 4 props on a component
 /// See `define_component` for a full example.
 @external(javascript, "../ffi.mjs", "addProps")
 pub fn with_4_props(
-  component: ComponentBase(props, emits),
-  props: #(Prop(p1), Prop(p2), Prop(p3), Prop(p4)),
+  component: ComponentBase(required_props, nullable_props, emits),
+  prop_1: Prop(p1),
+  prop_2: Prop(p2),
+  prop_3: Prop(p3),
+  prop_4: Prop(p4),
 ) -> ComponentBase(
   #(Computed(p1), Computed(p2), Computed(p3), Computed(p4)),
+  nullable_props,
+  emits,
+)
+
+/// Define 4 props on a component
+/// See `define_component` for a full example.
+@external(javascript, "../ffi.mjs", "addProps")
+pub fn with_4_nullable_props(
+  component: ComponentBase(required_props, nullable_props, emits),
+  prop_1: NullableProp(p1),
+  prop_2: NullableProp(p2),
+  prop_3: NullableProp(p3),
+  prop_4: NullableProp(p4),
+) -> ComponentBase(
+  required_props,
+  #(
+    Computed(Option(p1)),
+    Computed(Option(p2)),
+    Computed(Option(p3)),
+    Computed(Option(p4)),
+  ),
   emits,
 )
 
@@ -216,10 +294,37 @@ pub fn with_4_props(
 /// See `define_component` for a full example.
 @external(javascript, "../ffi.mjs", "addProps")
 pub fn with_5_props(
-  component: ComponentBase(props, emits),
-  props: #(Prop(p1), Prop(p2), Prop(p3), Prop(p4), Prop(p5)),
+  component: ComponentBase(required_props, nullable_props, emits),
+  prop_1: Prop(p1),
+  prop_2: Prop(p2),
+  prop_3: Prop(p3),
+  prop_4: Prop(p4),
+  prop_5: Prop(p5),
 ) -> ComponentBase(
   #(Computed(p1), Computed(p2), Computed(p3), Computed(p4), Computed(p5)),
+  nullable_props,
+  emits,
+)
+
+/// Define 5 props on a component
+/// See `define_component` for a full example.
+@external(javascript, "../ffi.mjs", "addProps")
+pub fn with_5_nullable_props(
+  component: ComponentBase(required_props, nullable_props, emits),
+  prop_1: NullableProp(p1),
+  prop_2: NullableProp(p2),
+  prop_3: NullableProp(p3),
+  prop_4: NullableProp(p4),
+  prop_5: NullableProp(p5),
+) -> ComponentBase(
+  required_props,
+  #(
+    Computed(Option(p1)),
+    Computed(Option(p2)),
+    Computed(Option(p3)),
+    Computed(Option(p4)),
+    Computed(Option(p5)),
+  ),
   emits,
 )
 
@@ -227,8 +332,13 @@ pub fn with_5_props(
 /// See `define_component` for a full example.
 @external(javascript, "../ffi.mjs", "addProps")
 pub fn with_6_props(
-  component: ComponentBase(props, emits),
-  props: #(Prop(p1), Prop(p2), Prop(p3), Prop(p4), Prop(p5), Prop(p6)),
+  component: ComponentBase(required_props, nullable_props, emits),
+  prop_1: Prop(p1),
+  prop_2: Prop(p2),
+  prop_3: Prop(p3),
+  prop_4: Prop(p4),
+  prop_5: Prop(p5),
+  prop_6: Prop(p6),
 ) -> ComponentBase(
   #(
     Computed(p1),
@@ -238,6 +348,31 @@ pub fn with_6_props(
     Computed(p5),
     Computed(p6),
   ),
+  nullable_props,
+  emits,
+)
+
+/// Define 6 props on a component
+/// See `define_component` for a full example.
+@external(javascript, "../ffi.mjs", "addProps")
+pub fn with_6_nullable_props(
+  component: ComponentBase(required_props, nullable_props, emits),
+  prop_1: NullableProp(p1),
+  prop_2: NullableProp(p2),
+  prop_3: NullableProp(p3),
+  prop_4: NullableProp(p4),
+  prop_5: NullableProp(p5),
+  prop_6: NullableProp(p6),
+) -> ComponentBase(
+  required_props,
+  #(
+    Computed(Option(p1)),
+    Computed(Option(p2)),
+    Computed(Option(p3)),
+    Computed(Option(p4)),
+    Computed(Option(p5)),
+    Computed(Option(p6)),
+  ),
   emits,
 )
 
@@ -245,8 +380,14 @@ pub fn with_6_props(
 /// See `define_component` for a full example.
 @external(javascript, "../ffi.mjs", "addProps")
 pub fn with_7_props(
-  component: ComponentBase(props, emits),
-  props: #(Prop(p1), Prop(p2), Prop(p3), Prop(p4), Prop(p5), Prop(p6), Prop(p7)),
+  component: ComponentBase(required_props, nullable_props, emits),
+  prop_1: Prop(p1),
+  prop_2: Prop(p2),
+  prop_3: Prop(p3),
+  prop_4: Prop(p4),
+  prop_5: Prop(p5),
+  prop_6: Prop(p6),
+  prop_7: Prop(p7),
 ) -> ComponentBase(
   #(
     Computed(p1),
@@ -257,6 +398,33 @@ pub fn with_7_props(
     Computed(p6),
     Computed(p7),
   ),
+  nullable_props,
+  emits,
+)
+
+/// Define 7 props on a component
+/// See `define_component` for a full example.
+@external(javascript, "../ffi.mjs", "addProps")
+pub fn with_7_nullable_props(
+  component: ComponentBase(required_props, nullable_props, emits),
+  prop_1: NullableProp(p1),
+  prop_2: NullableProp(p2),
+  prop_3: NullableProp(p3),
+  prop_4: NullableProp(p4),
+  prop_5: NullableProp(p5),
+  prop_6: NullableProp(p6),
+  prop_7: NullableProp(p7),
+) -> ComponentBase(
+  required_props,
+  #(
+    Computed(Option(p1)),
+    Computed(Option(p2)),
+    Computed(Option(p3)),
+    Computed(Option(p4)),
+    Computed(Option(p5)),
+    Computed(Option(p6)),
+    Computed(Option(p7)),
+  ),
   emits,
 )
 
@@ -264,17 +432,15 @@ pub fn with_7_props(
 /// See `define_component` for a full example.
 @external(javascript, "../ffi.mjs", "addProps")
 pub fn with_8_props(
-  component: ComponentBase(props, emits),
-  props: #(
-    Prop(p1),
-    Prop(p2),
-    Prop(p3),
-    Prop(p4),
-    Prop(p5),
-    Prop(p6),
-    Prop(p7),
-    Prop(p8),
-  ),
+  component: ComponentBase(required_props, nullable_props, emits),
+  prop_1: Prop(p1),
+  prop_2: Prop(p2),
+  prop_3: Prop(p3),
+  prop_4: Prop(p4),
+  prop_5: Prop(p5),
+  prop_6: Prop(p6),
+  prop_7: Prop(p7),
+  prop_8: Prop(p8),
 ) -> ComponentBase(
   #(
     Computed(p1),
@@ -286,6 +452,35 @@ pub fn with_8_props(
     Computed(p7),
     Computed(p8),
   ),
+  nullable_props,
+  emits,
+)
+
+/// Define 8 props on a component
+/// See `define_component` for a full example.
+@external(javascript, "../ffi.mjs", "addProps")
+pub fn with_8_nullable_props(
+  component: ComponentBase(required_props, nullable_props, emits),
+  prop_1: NullableProp(p1),
+  prop_2: NullableProp(p2),
+  prop_3: NullableProp(p3),
+  prop_4: NullableProp(p4),
+  prop_5: NullableProp(p5),
+  prop_6: NullableProp(p6),
+  prop_7: NullableProp(p7),
+  prop_8: NullableProp(p8),
+) -> ComponentBase(
+  required_props,
+  #(
+    Computed(Option(p1)),
+    Computed(Option(p2)),
+    Computed(Option(p3)),
+    Computed(Option(p4)),
+    Computed(Option(p5)),
+    Computed(Option(p6)),
+    Computed(Option(p7)),
+    Computed(Option(p8)),
+  ),
   emits,
 )
 
@@ -293,18 +488,16 @@ pub fn with_8_props(
 /// See `define_component` for a full example.
 @external(javascript, "../ffi.mjs", "addProps")
 pub fn with_9_props(
-  component: ComponentBase(props, emits),
-  props: #(
-    Prop(p1),
-    Prop(p2),
-    Prop(p3),
-    Prop(p4),
-    Prop(p5),
-    Prop(p6),
-    Prop(p7),
-    Prop(p8),
-    Prop(p9),
-  ),
+  component: ComponentBase(required_props, nullable_props, emits),
+  prop_1: Prop(p1),
+  prop_2: Prop(p2),
+  prop_3: Prop(p3),
+  prop_4: Prop(p4),
+  prop_5: Prop(p5),
+  prop_6: Prop(p6),
+  prop_7: Prop(p7),
+  prop_8: Prop(p8),
+  prop_9: Prop(p9),
 ) -> ComponentBase(
   #(
     Computed(p1),
@@ -317,6 +510,37 @@ pub fn with_9_props(
     Computed(p8),
     Computed(p9),
   ),
+  nullable_props,
+  emits,
+)
+
+/// Define 9 props on a component
+/// See `define_component` for a full example.
+@external(javascript, "../ffi.mjs", "addProps")
+pub fn with_9_nullable_props(
+  component: ComponentBase(required_props, nullable_props, emits),
+  prop_1: NullableProp(p1),
+  prop_2: NullableProp(p2),
+  prop_3: NullableProp(p3),
+  prop_4: NullableProp(p4),
+  prop_5: NullableProp(p5),
+  prop_6: NullableProp(p6),
+  prop_7: NullableProp(p7),
+  prop_8: NullableProp(p8),
+  prop_9: NullableProp(p9),
+) -> ComponentBase(
+  required_props,
+  #(
+    Computed(Option(p1)),
+    Computed(Option(p2)),
+    Computed(Option(p3)),
+    Computed(Option(p4)),
+    Computed(Option(p5)),
+    Computed(Option(p6)),
+    Computed(Option(p7)),
+    Computed(Option(p8)),
+    Computed(Option(p9)),
+  ),
   emits,
 )
 
@@ -324,16 +548,16 @@ pub fn with_9_props(
 /// Define emits on a component
 @external(javascript, "../ffi.mjs", "addEmits")
 pub fn with_emits(
-  base: ComponentBase(props, emits),
+  base: ComponentBase(required_props, nullable_props, emits),
   emits: List(String),
-) -> ComponentBase(props, new_emits)
+) -> ComponentBase(required_props, props, new_emits)
 
 /// Component setup function 
 /// See `define_component` for a full example.
 @external(javascript, "../ffi.mjs", "addSetup")
 pub fn setup(
-  base: ComponentBase(props, emits),
-  setup: fn(props, emits) -> a,
+  base: ComponentBase(required_props, nullable_props, emits),
+  setup: fn(required_props, nullable_props, emits) -> a,
 ) -> Component
 
 // Reactivity: Core
@@ -371,10 +595,7 @@ pub type DebuggerEvent
 pub type Watchable(value) {
   Ref(watchable: Ref(value))
   ShallowRef(watchable: ShallowRef(value))
-  NullableRef(watchable: NullableRef(value))
-  NullableShallowRef(watchable: NullableShallowRef(value))
   Computed(watchable: Computed(value))
-  NullableComputed(watchable: NullableComputed(value))
   Function(watchable: fn() -> value)
   Plain(watchable: value)
 }
@@ -545,7 +766,10 @@ pub fn shallow_ref_value(a: ShallowRef(value)) -> value
 
 /// Set shallow ref value
 @external(javascript, "../ffi.mjs", "refSet")
-pub fn shallow_ref_set(ref: ShallowRef(value), value: value) -> Ref(value)
+pub fn shallow_ref_set(
+  ref: ShallowRef(value),
+  value: value,
+) -> ShallowRef(value)
 
 // Lifecycles
 
@@ -586,51 +810,3 @@ pub fn inject_with_default(key: String, default: value) -> value
 
 @external(javascript, "../ffi.mjs", "injectWithFactory")
 pub fn inject_with_factory(key: String, factory: fn() -> value) -> value
-
-// Nullables
-
-/// NullableRef auto (un)wraps Option
-/// This is a convenience for using Ref(Option) in a template
-pub type NullableRef(value)
-
-@external(javascript, "../ffi.mjs", "nullableRef")
-pub fn nullable_ref(value: Option(value)) -> NullableRef(value)
-
-@external(javascript, "../ffi.mjs", "nullableValueGet")
-pub fn nullable_ref_value(ref: NullableRef(value)) -> Option(value)
-
-@external(javascript, "../ffi.mjs", "nullableValueSet")
-pub fn nullable_ref_set(
-  ref: NullableRef(value),
-  new_value: Option(value),
-) -> NullableRef(value)
-
-/// Shallow version of NullableRef
-pub type NullableShallowRef(value)
-
-@external(javascript, "../ffi.mjs", "nullableShallowRef")
-pub fn nullable_shallow(value: Option(value)) -> NullableShallowRef(value)
-
-@external(javascript, "vue", "triggerRef")
-pub fn trigger_nullable_shallow(ref: NullableShallowRef(value)) -> Nil
-
-@external(javascript, "../ffi.mjs", "nullableValueGet")
-pub fn nullable_shallow_value(ref: NullableShallowRef(value)) -> Option(value)
-
-@external(javascript, "../ffi.mjs", "nullableValueSet")
-pub fn nullable_shallow_set(
-  ref: NullableShallowRef(value),
-  new_value: Option(value),
-) -> NullableShallowRef(value)
-
-/// NullableComputed auto (un)wraps Option
-/// This is a convenience for using Computed(Option) in a template
-pub type NullableComputed(value)
-
-@external(javascript, "../ffi.mjs", "nullableComputed")
-pub fn nullable_computed(
-  callback: fn() -> Option(value),
-) -> NullableComputed(value)
-
-@external(javascript, "../ffi.mjs", "nullableValueGet")
-pub fn nullable_computed_value(ref: NullableComputed(value)) -> Option(value)
