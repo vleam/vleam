@@ -14,6 +14,10 @@
 - Fix hover
 - Fix incorrect line offset
 
+### Vite Plugin
+
+- Fix HMR
+
 ## v0.4.0
 
 ### FFI

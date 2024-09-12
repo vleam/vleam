@@ -13,17 +13,16 @@ It can be used in production, but may cause headaches to the developer.
 Vleam (Vue + gLEAM) is a set of tools allowing developers to _incrementally_
 incorporate the Gleam programming language into their Vue projects.
 
-Similarly to how Typescript helped Javascript handle what considered a large
-application in 2016, Gleam can help with what's considered large today. Many
-apps already exists that are not going to be rewritten. No reason why they
-shouldn't benefit from useful innovations, especially when they can be
+Similarly to how Typescript helped with the large codebases of 2016, Gleam can
+help with the large codebases of today. Most apps aren't going to be rewritten.
+No reason why they shouldn't benefit from a better language, especially when
 introduced slowly and incrementally, and particularly if it means less Typescript.
 
-Vleam consists of the following parts:
+Vleam consists of three parts:
 
 1. A Vite plugin that:
 
-- Allows the use of `<script lang="gleam">` in Vue's SFC
+- Allows the use of `<script lang="gleam">` in Vue SFCs
 - Allows improting `.gleam` files in Javascript/Typescript.
 
 2. A set of bindings to Vue's APIs.
@@ -161,7 +160,7 @@ fn use_todo_input_event(event: InputEvent) -> Result(Todo, TodoError)
 fn use_todo_input_event(event: InputEvent) -> Result(Todo, TodoError)
 ```
 
-- If the LSP glitches inside `<script lang="gleam">`, resave the file. Also try
+- If the LSP glitches `<script lang="gleam">`, resave the file. Also try
   formatting the gleam code then save.
 
 - Vleam is experimental. Vite may output errors even when things are fine. Try
@@ -172,7 +171,15 @@ fn use_todo_input_event(event: InputEvent) -> Result(Todo, TodoError)
 
 #### HMR
 
-HMR will trigger a full refresh until [gleam-lang/gleam#3178](https://github.com/gleam-lang/gleam/issues/3178) is fixed.
+Due to the way HMR works, `instanceof` may break if a new version of the class
+is reloaded after objects were instantiated with its previous version. A full
+refresh is required in such cases.
+
+Due to Gleam's heavy reliance on `instanceof`, please make sure you refresh on
+any dependency change. If this arises frequently with your own code, it's best
+to configure Vite to refresh on every change.
+
+HMR will otherwise work as expected, enjoy!
 
 #### `toRefs`, `reactive` support
 

@@ -7,7 +7,7 @@ import { parse as vueParse } from "@vue/compiler-sfc";
 
 export const GEN_DIR = "vleam_generated";
 const SRC_DIR = "src";
-const GLEAM_COMPILED_JS = "build/dev/javascript";
+const GLEAM_COMPILED_ROOT = "build/dev/javascript";
 export const baseGeneratedGleamPath = (projectRoot: string) =>
   path.join(projectRoot, SRC_DIR, GEN_DIR);
 
@@ -20,9 +20,11 @@ export async function toVleamGeneratedPath(
   vuePath: string,
 ): Promise<string> {
   const srcPath = path.join(projectRoot, SRC_DIR);
+
   const relativeModulePath = path
     .relative(srcPath, path.dirname(vuePath))
     .toLowerCase();
+
   const moduleFileName = path
     .basename(vuePath)
     .toLowerCase()
@@ -165,7 +167,7 @@ async function resolveGleamCompiledPath(
   const sourceRelPath = path.relative(srcPath, gleamFilePath);
   return path.join(
     projectRoot,
-    GLEAM_COMPILED_JS,
+    GLEAM_COMPILED_ROOT,
     actualName,
     sourceRelPath.replace(".gleam", ".mjs"),
   );
@@ -178,7 +180,7 @@ export async function resolveGleamImport(
   projectName?: string,
 ) {
   if (importPath.startsWith("hex:")) {
-    return path.join(projectRoot, GLEAM_COMPILED_JS, importPath.slice(4));
+    return path.join(projectRoot, GLEAM_COMPILED_ROOT, importPath.slice(4));
   }
 
   if (!importPath.startsWith(".")) {
