@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### FFI
+
+- Fix template unwrapping breaking for class methods
+
 ## v0.4.0
 
 ### FFI
