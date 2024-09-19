@@ -1,30 +1,32 @@
-<p align="center">
-  <img src="logo.png">
-</p>
-
 ### **THIS IS EXPERIMENTAL SOFTWARE**.
 
 It can be used in production, but may cause headaches to the developer.
 
+<p align="center">
+  <img height="200" src="logo.png">
+</p>
+
 # Vleam
 
-**Incrementally incorporate Gleam in Vue projects**
+**Incrementally incorporate Gleam in Vue projects to enjoy an enjoyable language**
 
-Vleam (Vue + gLEAM) is a set of tools allowing developers to _incrementally_
+Vleam (Vue + Gleam) is a set of tools allowing developers to _incrementally_
 incorporate the Gleam programming language into their Vue projects.
 
-Similarly to how Typescript helped Javascript handle what considered a large
-application in 2016, Gleam can help with what's considered large today. Many
-apps already exists that are not going to be rewritten. No reason why they
-shouldn't benefit from useful innovations, especially when they can be
+Similarly to how Typescript helped with the large codebases of 2016, Gleam can
+help with the large codebases of today. Most apps aren't going to be rewritten.
+No reason why they shouldn't benefit from a better language, especially when
 introduced slowly and incrementally, and particularly if it means less Typescript.
 
-Vleam consists of the following parts:
+To learn more about how Gleam can do those things, visit [Gleam's language tour](https://tour.gleam.run)
+if you haven't already.
+
+Vleam consists of three parts:
 
 1. A Vite plugin that:
 
-- Allows the use of `<script lang="gleam">` in Vue's SFC
-- Allows improting `.gleam` files in Javascript/Typescript.
+- Allows the use of `<script lang="gleam">` in Vue SFCs
+- Allows importing `.gleam` files in Javascript/Typescript.
 
 2. A set of bindings to Vue's APIs.
 
@@ -38,7 +40,7 @@ Vleam consists of the following parts:
 
 ## Setup
 
-The following examples use `pnpm` but `yarn` or `npm` should work as well.
+The following uses `pnpm` but `yarn` or `npm` should work as well.
 
 First, setup a Gleam project in your Vue project's root by using `gleam new` or
 by manually creating a `gleam.toml` file. Make sure you set `target = "javascript"`.
@@ -110,7 +112,7 @@ pub fn default_export() -> Component {
   define_component([], [], False)
   |> with_1_prop(#(Prop("initialCount", Some(0))))
   // Props are handed as Computed to stay reactive
-  |> setup(fn(props: #(Computed(Int)), _) {
+  |> setup(fn(props: #(Computed(Int)), _, _) {
     let initial_count = props.0
 
     let counter =
@@ -146,6 +148,49 @@ For more information on Vue bindings in Gleam, see the reference at Hexdocs:
 
 https://hexdocs.pm/vleam
 
+### Automatic Unwrapping
+
+Vleam takes inspiration from Gleam in its magic avoidance, only introducing it
+when the alternative is too poor of a developer experience. The only such case
+at the moment is null handling in templates.
+
+Gleam doesn't have null. Therefore, every time a setup function returns an `Option`,
+it will be unwrapped to the contained value if `Some`, or to `null` if `None`.
+
+This unwrapping happens for:
+
+1. A literal `Option`
+2. Functions returning an `Option`, recursively
+3. Records' fields which are an `Option`, non-recursively
+
+Recursing records for the unwrapping of fields in arbitrary depths is not supported
+due to performance considerations.
+
+ALL THREE AFFECT ONLY VALUES RETURNED BY `setup`. If you have acquired an `Option`
+through other means (e.g a global vue value or an event), it will not be unwrapped.
+This is an unfortunate limitation of Vue.
+
+Nullable values going from the template into Gleam code (via a function call) will
+need to be converted into an `Option`. This can be done ergonomically with
+`globalProperties`:
+
+```ts
+// define once in main.ts
+import {
+  Some,
+  None,
+} from "/build/dev/javascript/gleam_stdlib/gleam/option.mjs";
+
+app.config.globalProperties.toOption = (nullable) =>
+  nullable == null ? new None() : new Some(nullable);
+```
+
+Then, use in templates:
+
+```vue
+<button @click="signup(email, password, toOption(phoneNumber))">Sign Up</button>
+```
+
 ### Tips
 
 - Use absolute paths with Gleam `@external`. Vite will resolve them relative
@@ -161,18 +206,25 @@ fn use_todo_input_event(event: InputEvent) -> Result(Todo, TodoError)
 fn use_todo_input_event(event: InputEvent) -> Result(Todo, TodoError)
 ```
 
-- If the LSP glitches inside `<script lang="gleam">`, resave the file. Also try
+- If the LSP glitches `<script lang="gleam">`, resave the file. Also try
   formatting the gleam code then save.
 
-- Vleam is experimental. Vite may output errors even when things are fine. Try
-  navigating to your Vue app in development mode and read the errors in the
-  browser console for more information.
+- If something doesn't work and you're not sure why, check the browser console
+  for errors, and scroll up the terminal to see if any error slipped by.
 
 ### Limitations
 
 #### HMR
 
-HMR will trigger a full refresh until [gleam-lang/gleam#3178](https://github.com/gleam-lang/gleam/issues/3178) is fixed.
+Due to the way HMR works, `instanceof` may break if a new version of the class
+is reloaded after objects were instantiated with its previous version. A full
+refresh is required in such cases.
+
+Due to Gleam's heavy reliance on `instanceof`, please make sure you refresh on
+any dependency change. If this arises frequently with your own code, it's best
+to configure Vite to refresh on every change.
+
+HMR will otherwise work as expected, enjoy!
 
 #### `toRefs`, `reactive` support
 

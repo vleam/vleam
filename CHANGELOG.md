@@ -1,5 +1,23 @@
 # Changelog
 
+## v0.5.0
+
+### FFI
+
+- Fix template unwrapping breaking for class methods
+
+### LSP
+
+- Enable go to definition
+- Enable code actions
+- Fix auto-completions
+- Fix hover
+- Fix incorrect line offset
+
+### Vite Plugin
+
+- Fix HMR
+
 ## v0.4.0
 
 ### FFI

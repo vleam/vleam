@@ -21,7 +21,7 @@ fn title_component() -> Component
 
 pub fn default_export() -> Component {
   define_component([#("Title", title_component)], [], False)
-  |> setup(fn(_, _) {
+  |> setup(fn(_, _, _) {
     let todos_list: vue.Ref(List(Todo)) = use_local_todos()
     let todos_dict: vue.ShallowRef(dict.Dict(Int, Todo)) =
       todos_list
@@ -216,7 +216,7 @@ minimally changed template in an existing codebase
       <label for="toggle-all">Mark all as complete</label>
       <ul class="todo-list">
         <li
-          v-for="todo in filteredTodos.toArray()"
+          v-for="todo in filteredTodos"
           class="todo"
           :key="todo.id"
           :class="{ completed: todo.completed, editing: todo.id === idToEdit }"

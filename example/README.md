@@ -1,8 +1,4 @@
-# This Example is WIP and not yet functional
-
-Yet it can be helpful to read its code
-
-# Vleam Todo
+# Vleam Todo -- "The Kitchen Sink"
 
 ## The Vue + Gleam Example Todo App
 
@@ -30,7 +26,6 @@ https://github.com/vleam/vleam
 
 ```sh
 pnpm install
-gleam update
 ```
 
 ### Compile and Hot-Reload for Development

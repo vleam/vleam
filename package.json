@@ -1,12 +1,12 @@
 {
   "name": "vleam",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Code using Gleam in Vue projects",
   "repository": {
     "url": "https://github.com/ofekd/vleam"
   },
   "bin": {
-    "vleam": "./dist/cli.mjs"
+    "vleam": "./dist/cli/index.mjs"
   },
   "scripts": {
     "build": "tsup",
@@ -21,8 +21,7 @@
     ".": {
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "default": "./dist/index.mjs"
+      "require": "./dist/index.js"
     }
   },
   "keywords": [
@@ -36,27 +35,27 @@
   "author": "Ofek Doitch",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@types/node": "^20.14.0",
-    "@vue/compiler-core": "^3.4.27",
-    "@vue/compiler-dom": "^3.4.27",
+    "@types/node": "^22.5.5",
+    "@vue/compiler-core": "^3.5.6",
+    "@vue/compiler-dom": "^3.5.6",
     "cac": "^6.7.14",
-    "picocolors": "^1.0.1",
-    "prettier": "^3.3.0",
-    "tsup": "^8.1.0",
-    "typescript": "^5.4.5"
+    "picocolors": "^1.1.0",
+    "prettier": "^3.3.3",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.2"
   },
   "dependencies": {
-    "@vue/compiler-sfc": "^3.4.27",
-    "@vueuse/core": "^10.10.0",
+    "@vue/compiler-sfc": "^3.5.6",
+    "@vueuse/core": "^11.1.0",
     "json-rpc-2.0": "^1.7.0",
-    "magic-string": "^0.30.10",
-    "rimraf": "^5.0.7",
-    "rollup": "^4.18.0",
+    "magic-string": "^0.30.11",
+    "rimraf": "^6.0.1",
+    "rollup": "^4.22.0",
     "toml": "^3.0.0",
-    "vite": "^5.2.12",
+    "vite": "^5.4.6",
     "vscode-jsonrpc": "^8.2.1",
     "vscode-languageclient": "^9.0.1",
     "vscode-uri": "^3.0.8",
-    "vue": "^3.4.27"
+    "vue": "^3.5.6"
   }
 }

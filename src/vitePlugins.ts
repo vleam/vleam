@@ -1,4 +1,5 @@
 import * as fs from "node:fs/promises";
+import * as path from "node:path";
 import MagicString from "magic-string";
 import type { Plugin } from "vite";
 import {
@@ -13,6 +14,15 @@ import {
 
 export type VleamQuery = {};
 
+// Splits `SFCNames.vue?with=querystring` into
+// ```
+// {
+//   filename: 'SFCNames.vue',
+//   query: {
+//     with: 'querystring',
+//   },
+// }
+// ```
 export function parseVleamRequest(id: string): {
   filename: string;
   query: VleamQuery;
@@ -23,6 +33,77 @@ export function parseVleamRequest(id: string): {
     query: {},
   };
 }
+
+const transform = async (
+  code: string,
+  id: string,
+  { projectRoot, projectName, gleamScriptSfcs },
+) => {
+  const { filename } = parseVleamRequest(id);
+
+  if (filename.endsWith(".vue")) {
+    const gleamTargetPath = await toVleamGeneratedPath(projectRoot, filename);
+    const gleamBlock = getGleamBlockFromCode(code);
+
+    if (!gleamBlock) {
+      return;
+    }
+
+    // Generate the Gleam file
+    await fs.writeFile(gleamTargetPath, gleamBlock.content.replace(/^\n/, ""), {
+      encoding: "utf8",
+    });
+
+    // Compile Gleam code
+    await gleamBuild();
+
+    // Get compiled file
+    const compiledContent = await readCompiledGleamFile(
+      projectRoot,
+      gleamTargetPath,
+      projectName,
+    );
+
+    // Inject compiled code into SFC
+    const magicString = new MagicString(code)
+      .replace(
+        gleamBlock.content,
+        compiledContent + "\nexport default default_export();",
+      )
+      .replace('lang="gleam"', 'lang="ts"');
+
+    // Track SFCs with Gleam scripts
+    gleamScriptSfcs.add(filename);
+
+    return {
+      code: magicString.toString(),
+      map: magicString.generateMap({
+        source: filename,
+        includeContent: true,
+      }),
+    };
+  } else if (filename.endsWith(".gleam")) {
+    // No need to `gleam build` here, we'll build on startup and watch
+
+    const compiledContent = await readCompiledGleamFile(
+      projectRoot,
+      filename,
+      projectName,
+    );
+
+    const magicString = new MagicString(code)
+      .replace(code, compiledContent)
+      .replace('lang="gleam"', 'lang="ts"');
+
+    return {
+      code: magicString.toString(),
+      map: magicString.generateMap({
+        source: filename,
+        includeContent: true,
+      }),
+    };
+  }
+};
 
 export async function vitePluginVueVleam(): Promise<Plugin> {
   const projectRoot = process.cwd();
@@ -65,90 +146,30 @@ export async function vitePluginVueVleam(): Promise<Plugin> {
         return { id: resolvedGleamImport };
       }
     },
-    async handleHotUpdate({ modules, server, file }) {
-      if (modules.some(({ info }) => info?.meta?.vueGleam?.isGleamScript)) {
-        server.ws.send({
-          type: "full-reload",
-        });
-        return [];
-      }
-
-      const { filename } = parseVleamRequest(file);
-
-      if (filename.endsWith("gleam.mjs")) {
-        return [];
-      }
-
+    async transform(code, id) {
+      return transform(code, id, { projectName, projectRoot, gleamScriptSfcs });
+    },
+    async watchChange(id, _change) {
+      const { filename } = parseVleamRequest(id);
       if (filename.endsWith(".gleam")) {
         await gleamBuild();
       }
-
-      return modules;
     },
-    async transform(code, id) {
-      const { filename } = parseVleamRequest(id);
-      if (filename.endsWith(".vue")) {
-        const gleamTargetPath = await toVleamGeneratedPath(
-          projectRoot,
-          filename,
-        );
+    async handleHotUpdate(ctx) {
+      const { filename } = parseVleamRequest(ctx.file);
 
-        const gleamBlock = getGleamBlockFromCode(code);
+      // Send compiled & transformed versions of Gleam scripts and Gleam files
+      if (gleamScriptSfcs.has(filename) || filename.endsWith(".gleam")) {
+        const { read } = ctx;
+        ctx.read = async () => {
+          const content = await read();
+          const transformed = await transform(content, ctx.file, {
+            projectName,
+            projectRoot,
+            gleamScriptSfcs,
+          });
 
-        if (!gleamBlock) {
-          return;
-        }
-
-        await fs.writeFile(gleamTargetPath, gleamBlock.content, {
-          encoding: "utf8",
-        });
-
-        await gleamBuild();
-
-        const compiledContent = await readCompiledGleamFile(
-          projectRoot,
-          gleamTargetPath,
-          projectName,
-        );
-
-        const magicString = new MagicString(code)
-          .replace(
-            gleamBlock.content,
-            compiledContent + "\nexport default default_export();",
-          )
-          .replace('lang="gleam"', 'lang="ts"');
-
-        gleamScriptSfcs.add(filename);
-
-        return {
-          code: magicString.toString(),
-          map: magicString.generateMap({
-            source: filename,
-            includeContent: true,
-          }),
-          meta: {
-            vueGleam: {
-              isGleamScript: true,
-            },
-          },
-        };
-      } else if (filename.endsWith(".gleam")) {
-        const compiledContent = await readCompiledGleamFile(
-          projectRoot,
-          filename,
-          projectName,
-        );
-
-        const magicString = new MagicString(code)
-          .replace(code, compiledContent)
-          .replace('lang="gleam"', 'lang="ts"');
-
-        return {
-          code: magicString.toString(),
-          map: magicString.generateMap({
-            source: filename,
-            includeContent: true,
-          }),
+          return transformed?.code || content;
         };
       }
     },

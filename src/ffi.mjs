@@ -81,6 +81,13 @@ function makeTemplateFriendly(value, isNestedProxy) {
     return new Proxy(value, {
       get(target, key, receiver) {
         const val = Reflect.get(target, key, receiver);
+
+        if (typeof val === "function") {
+          return (...args) => {
+            return makeTemplateFriendly(Reflect.apply(val, target, args), true);
+          };
+        }
+
         return makeTemplateFriendly(val, true);
       },
     });
