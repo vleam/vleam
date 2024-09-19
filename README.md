@@ -18,6 +18,9 @@ help with the large codebases of today. Most apps aren't going to be rewritten.
 No reason why they shouldn't benefit from a better language, especially when
 introduced slowly and incrementally, and particularly if it means less Typescript.
 
+To learn more about how Gleam can do those things, visit [Gleam's language tour](https://tour.gleam.run)
+if you haven't already.
+
 Vleam consists of three parts:
 
 1. A Vite plugin that:
@@ -206,9 +209,8 @@ fn use_todo_input_event(event: InputEvent) -> Result(Todo, TodoError)
 - If the LSP glitches `<script lang="gleam">`, resave the file. Also try
   formatting the gleam code then save.
 
-- Vleam is experimental. Vite may output errors even when things are fine. Try
-  navigating to your Vue app in development mode and read the errors in the
-  browser console for more information.
+- If something doesn't work and you're not sure why, check the browser console
+  for errors, and scroll up the terminal to see if any error slipped by.
 
 ### Limitations
 
