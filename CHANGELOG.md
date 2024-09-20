@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### LSP
+
+- Fix incorrect line offset for some messages
+
 ## v0.5.0
 
 ### FFI

@@ -85,9 +85,16 @@ async function transformIncomingMessage(message: rpc.Message) {
         vueFileContent.substring(0, gleamScriptTagIndex),
       );
 
-      // Cache line number
-      const uriOrId = vueFileUriString || (message as any).id;
-      messageLineNumberMap[uriOrId] = lineNumber;
+      // Cache line number by file path
+      if (vueFileUriString) {
+        messageLineNumberMap[vueFileUriString] = lineNumber;
+      }
+
+      // Cache line number by message id
+      const messageId = (message as any).id;
+      if (messageId) {
+        messageLineNumberMap[messageId] = lineNumber;
+      }
 
       const gleamFileUriString = URI.file(gleamFilePath).toString();
       gleamToVueUriMap[gleamFileUriString] = vueFileUriString;
