@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.5.1
+
+### LSP
+
+- Fix incorrect line offset for some messages
+
+### Vite Plugin
+
+- Show Gleam build errors in the error overlay
+
 ## v0.5.0
 
 ### FFI
