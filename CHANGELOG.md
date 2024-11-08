@@ -1,5 +1,19 @@
 # Changelog
 
+## v0.6.1
+
+### FFI
+
+- Upgrade dependencies
+
+### LSP
+
+- Upgrade dependencies
+
+### Vite Plugin
+
+- Upgrade dependencies
+
 ## v0.6.0
 
 ### FFI
