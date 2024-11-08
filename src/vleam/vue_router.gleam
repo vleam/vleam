@@ -52,3 +52,11 @@ pub fn push(router: Router, to: String) -> Nil
 
 @external(javascript, "../routerFfi.mjs", "replace")
 pub fn replace(router: Router, to: String) -> Nil
+
+// Guards
+
+@external(javascript, "vue-router", "onBeforeRouteLeave")
+pub fn on_before_route_leave(handler: fn() -> Nil) -> Nil
+
+@external(javascript, "vue-router", "onBeforeRouteUpdate")
+pub fn on_before_route_update(handler: fn() -> Nil) -> Nil

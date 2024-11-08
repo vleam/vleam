@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.6.0
+
+### FFI
+
+- Add `vue_router` Navigation Guards bindings
+
 ## v0.5.1
 
 ### LSP
