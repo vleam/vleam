@@ -7,10 +7,11 @@ import {
   cleanGenerated,
   readCompiledGleamFile,
   gleamProjectName,
-  resolveGleamImport,
+  rewriteRelativeImports,
   getGleamBlockFromCode,
   GEN_DIR,
   toVueOriginalPath,
+  rewriteGleamImports,
 } from "./utils";
 
 export type VleamQuery = {};
@@ -148,28 +149,6 @@ const transform = async (
         }),
       },
     };
-  } else if (filename.endsWith(".gleam")) {
-    // No need to `gleam build` here, we'll build on startup and watch
-
-    const compiledContent = await readCompiledGleamFile(
-      projectRoot,
-      filename,
-      projectName,
-    );
-
-    const magicString = new MagicString(code)
-      .replace(code, compiledContent)
-      .replace('lang="gleam"', 'lang="ts"');
-
-    return {
-      transformation: {
-        code: magicString.toString(),
-        map: magicString.generateMap({
-          source: filename,
-          includeContent: true,
-        }),
-      },
-    };
   }
 
   return {};
@@ -215,24 +194,26 @@ export async function vitePluginVueVleam(): Promise<Plugin> {
 
       const { filename } = parseVleamRequest(importer);
 
-      const shouldResolve =
-        filename.endsWith(".gleam") ||
-        filename === "./gleam.mjs" ||
-        gleamScriptSfcs.has(filename);
+      if (source.endsWith(".gleam")) {
+        const rewrittenPath = await rewriteGleamImports(
+          projectRoot,
+          filename,
+          source,
+        );
+        if (rewrittenPath) {
+          return { id: rewrittenPath };
+        }
+      } else if (gleamScriptSfcs.has(filename)) {
+        const rewrittenPath = await rewriteRelativeImports(
+          projectRoot,
+          filename,
+          source,
+          projectName,
+        );
 
-      if (!shouldResolve) {
-        return;
-      }
-
-      const resolvedGleamImport = await resolveGleamImport(
-        projectRoot,
-        filename,
-        source,
-        projectName,
-      );
-
-      if (resolvedGleamImport) {
-        return { id: resolvedGleamImport };
+        if (rewrittenPath) {
+          return { id: rewrittenPath };
+        }
       }
     },
     async transform(code, id) {

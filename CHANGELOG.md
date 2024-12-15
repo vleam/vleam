@@ -13,6 +13,8 @@
 ### Vite Plugin
 
 - Upgrade dependencies
+- Fix a bug where Gleam imports in a JavaScript file will use a different source
+  than Gleam imports in Gleam code.
 
 ## v0.6.1
 
