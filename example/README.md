@@ -39,3 +39,7 @@ pnpm dev
 ```sh
 pnpm build
 ```
+
+### Bug Hunt
+
+There's a bug in this example! Can you find it and fix it?

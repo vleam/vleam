@@ -1,5 +1,4 @@
 <script lang="gleam">
-import gleam/bool
 import gleam/dict
 import gleam/int
 import gleam/list
@@ -7,7 +6,7 @@ import gleam/option.{None, Some}
 import gleam/string
 import vleam/vue.{
   type Component, define_component, ref_set, ref_value, setup, shallow_ref_set,
-  shallow_ref_value, watch1,
+  shallow_ref_value,
 }
 
 import vleam_todo/models.{type Todo, Todo, new_todo}
@@ -30,7 +29,8 @@ pub fn default_export() -> Component {
       |> dict.from_list
       |> vue.shallow_ref
 
-    watch1(#(vue.ShallowRef(todos_dict)), fn(_, _, _) {
+    vue.watch_shallow_ref(todos_dict)
+    |> vue.with_listener(fn(_, _, _) {
       todos_list
       |> ref_set(
         todos_dict
@@ -46,8 +46,10 @@ pub fn default_export() -> Component {
         todos_list
         |> vue.ref_value
         |> list.map(fn(todo_item) {
-          !todo_item.completed
-          |> bool.to_int
+          case todo_item.completed {
+            False -> 1
+            True -> 0
+          }
         })
         |> int.sum
       })
@@ -114,33 +116,31 @@ pub fn default_export() -> Component {
     }
 
     let done_edit = fn() {
-      let new_todos = case
-        edited_title_draft
-        |> ref_value
-        |> string.length
-        > 0
-      {
-        True -> {
-          todos_dict
-          |> shallow_ref_value
-          |> dict.update(
-            todo_id_to_edit
-              |> ref_value,
-            fn(maybe_t) {
-              case maybe_t {
-                Some(t) -> Todo(..t, title: ref_value(edited_title_draft))
-                None -> new_todo(ref_value(edited_title_draft))
-              }
-            },
-          )
-        }
-        False -> {
-          todos_dict
-          |> shallow_ref_value
-          |> dict.delete(
-            todo_id_to_edit
-            |> ref_value,
-          )
+      let new_todos = {
+        let title = vue.ref_value(edited_title_draft)
+
+        case string.is_empty(title) {
+          True ->
+            todos_dict
+            |> shallow_ref_value
+            |> dict.delete(
+              todo_id_to_edit
+              |> vue.ref_value,
+            )
+
+          False ->
+            todos_dict
+            |> shallow_ref_value
+            |> dict.upsert(
+              todo_id_to_edit
+                |> ref_value,
+              fn(maybe_t) {
+                case maybe_t {
+                  Some(t) -> Todo(..t, title: ref_value(edited_title_draft))
+                  None -> new_todo(ref_value(edited_title_draft))
+                }
+              },
+            )
         }
       }
 

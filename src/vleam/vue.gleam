@@ -118,7 +118,7 @@ pub type NullableProp(value) {
 ///     Prop("greeting", Some("Hello, ")),
 ///   )
 ///   // Props are handed as Computed for reactivity. It's best practice to
-///   // always type them, as types are only inferred if there's a default value.
+///   // always type them, as types aren't always inferred.
 ///   |> setup(fn(
 ///     required_props: #(Computed(String)),
 ///     nullable_props: #(Computed(String)),
@@ -127,8 +127,9 @@ pub type NullableProp(value) {
 ///     let initial_name = props.0
 ///     let greeting = props.1
 ///
-///     // Errors are thrown. This is just a demo, don't throw on bad input,
-///     // only on irrecoverable errors.
+///     // Errors return from `setup` are thrown. This is just a demo, don't
+///     // throw on bad input, only on irrecoverable errors (which generally
+///     // should never occur in `setup` function)
 ///     use <- bool.guard(
 ///       {
 ///         greeting
@@ -167,7 +168,7 @@ pub type NullableProp(value) {
 ///       })
 ///
 ///     // To return values to the template, the FFI expects an Ok() with a
-///     // tuple of object entires tuples. The following is identical to Vue's:
+///     // tuple of object entries. The following is identical to Vue's:
 ///     //
 ///     // return {
 ///     //   fullGreeting: full_greeting,
@@ -197,7 +198,7 @@ pub fn with_1_prop(
   prop_1: Prop(p1),
 ) -> ComponentBase(#(Computed(p1)), nullable_props, emits)
 
-/// Define 1 prop on a component
+/// Define 1 nullable prop on a component
 /// See `define_component` for a full example.
 @external(javascript, "../ffi.mjs", "addProps")
 pub fn with_1_nullable_prop(
@@ -214,7 +215,7 @@ pub fn with_2_props(
   prop_2: Prop(p2),
 ) -> ComponentBase(#(Computed(p1), Computed(p2)), nullable_props, emits)
 
-/// Define 2 props on a component
+/// Define 2 nullable props on a component
 /// See `define_component` for a full example.
 @external(javascript, "../ffi.mjs", "addProps")
 pub fn with_2_nullable_props(
@@ -241,7 +242,7 @@ pub fn with_3_props(
   emits,
 )
 
-/// Define 3 props on a component
+/// Define 3 nullable props on a component
 /// See `define_component` for a full example.
 @external(javascript, "../ffi.mjs", "addProps")
 pub fn with_3_nullable_props(
@@ -270,7 +271,7 @@ pub fn with_4_props(
   emits,
 )
 
-/// Define 4 props on a component
+/// Define 4 nullable props on a component
 /// See `define_component` for a full example.
 @external(javascript, "../ffi.mjs", "addProps")
 pub fn with_4_nullable_props(
@@ -306,7 +307,7 @@ pub fn with_5_props(
   emits,
 )
 
-/// Define 5 props on a component
+/// Define 5 nullable props on a component
 /// See `define_component` for a full example.
 @external(javascript, "../ffi.mjs", "addProps")
 pub fn with_5_nullable_props(
@@ -352,7 +353,7 @@ pub fn with_6_props(
   emits,
 )
 
-/// Define 6 props on a component
+/// Define 6 nullable props on a component
 /// See `define_component` for a full example.
 @external(javascript, "../ffi.mjs", "addProps")
 pub fn with_6_nullable_props(
@@ -402,7 +403,7 @@ pub fn with_7_props(
   emits,
 )
 
-/// Define 7 props on a component
+/// Define 7 nullable props on a component
 /// See `define_component` for a full example.
 @external(javascript, "../ffi.mjs", "addProps")
 pub fn with_7_nullable_props(
@@ -456,7 +457,7 @@ pub fn with_8_props(
   emits,
 )
 
-/// Define 8 props on a component
+/// Define 8 nullable props on a component
 /// See `define_component` for a full example.
 @external(javascript, "../ffi.mjs", "addProps")
 pub fn with_8_nullable_props(
@@ -514,7 +515,7 @@ pub fn with_9_props(
   emits,
 )
 
-/// Define 9 props on a component
+/// Define 9 nullable props on a component
 /// See `define_component` for a full example.
 @external(javascript, "../ffi.mjs", "addProps")
 pub fn with_9_nullable_props(

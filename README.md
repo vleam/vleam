@@ -1,10 +1,50 @@
-### **THIS IS EXPERIMENTAL SOFTWARE**.
-
-It can be used in production, but may cause headaches to the developer.
-
 <p align="center">
   <img height="200" src="logo.png">
 </p>
+
+```vue
+<template>
+  <div>{{ count }}</div>
+  <button @click="() => increment()">Increment</button>
+</template>
+
+<script lang="gleam">
+import gleam/option.{Some}
+import vleam/vue.{type Component, Prop, define_component, setup, with_1_prop}
+
+// THIS FUNCTION MUST EXIST
+pub fn default_export() -> Component {
+  define_component([], [], False)
+  |> with_1_prop(#(Prop("initialCount", Some(0))))
+  // Props are handed as Computed to stay reactive
+  |> setup(fn(props: #(Computed(Int)), _, _) {
+    let initial_count = props.0
+
+    let count =
+      initial_count
+      |> vue.computed_value
+      |> vue.ref
+
+    let increment = fn() -> Int {
+      let current_count =
+        count
+        |> vue.ref_value
+
+      count
+      |> vue.ref_set(current_count)
+
+      current_count
+    }
+
+    // returning an Error will cause `setup` to throw it (don't do that)
+    Ok(#(
+      #("count", count),
+      #("increment", increment),
+    ))
+  })
+}
+</script>
+```
 
 # Vleam
 
@@ -115,25 +155,25 @@ pub fn default_export() -> Component {
   |> setup(fn(props: #(Computed(Int)), _, _) {
     let initial_count = props.0
 
-    let counter =
+    let count =
       initial_count
       |> vue.computed_value
       |> vue.ref
 
     let increment = fn() -> Int {
       let current_count =
-        counter
+        count
         |> vue.ref_value
 
-      counter
+      count
       |> vue.ref_set(current_count)
 
       current_count
     }
 
-    // returning an Error will cause `setup` to throw it
+    // returning an Error will cause `setup` to throw it (don't do that)
     Ok(#(
-      #("counter", counter),
+      #("count", count),
       #("increment", increment),
     ))
   })
@@ -148,7 +188,7 @@ For more information on Vue bindings in Gleam, see the reference at Hexdocs:
 
 https://hexdocs.pm/vleam
 
-### Automatic Unwrapping
+### Automatic Unwrapping: Vleam's only "Gotcha"
 
 Vleam takes inspiration from Gleam in its magic avoidance, only introducing it
 when the alternative is too poor of a developer experience. The only such case
@@ -229,6 +269,11 @@ HMR will otherwise work as expected, enjoy!
 #### `toRefs`, `reactive` support
 
 `toRefs` and `reactive` are not easy to translate into Gleam. Research required.
+
+#### TypeScript type checks
+
+In some configurations, TypeScript may try to analyze `Vue` files with a `gleam`
+block. This should be solved as part of [vuejs/language-tools#4433](https://github.com/vuejs/language-tools/issues/4433).
 
 ### Sponsored by Nestful
 
