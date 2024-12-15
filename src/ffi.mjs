@@ -2,7 +2,6 @@ import {
   watch as vueWatch,
   inject as vueInject,
   computed as vueComputed,
-  isRef,
 } from "vue";
 
 import { Result, Ok, Error } from "./gleam.mjs";
@@ -152,7 +151,20 @@ export function refSet(ref, newValue) {
   return ref;
 }
 
-export function watch(
+export function newReflikes(watchable) {
+  return [watchable.watchable];
+}
+
+export function addWatchableToReflikes(reflikes, watchable) {
+  reflikes.push(watchable.watchable);
+  return reflikes;
+}
+
+export function mergeReflikes(reflikes1, reflikes2) {
+  return [reflikes1, reflikes2].flat();
+}
+
+export function do_watch(
   reflikes,
   callback,
   immediate,
@@ -162,18 +174,14 @@ export function watch(
   onTrigger,
   once,
 ) {
-  return vueWatch(
-    reflikes.map((w) => w.watchable),
-    callback,
-    {
-      immediate: unwrapOption(immediate, undefined),
-      deep: unwrapOption(deep, undefined),
-      flush: unwrapOption(flush, undefined),
-      onTrack: unwrapOption(onTrack, undefined),
-      onTrigger: unwrapOption(onTrigger, undefined),
-      once: unwrapOption(once, undefined),
-    },
-  );
+  return vueWatch(reflikes, callback, {
+    immediate: unwrapOption(immediate, undefined),
+    deep: unwrapOption(deep, undefined),
+    flush: unwrapOption(flush, undefined),
+    onTrack: unwrapOption(onTrack, undefined),
+    onTrigger: unwrapOption(onTrigger, undefined),
+    once: unwrapOption(once, undefined),
+  });
 }
 
 export function inject(key) {
