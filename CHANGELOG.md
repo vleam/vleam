@@ -1,5 +1,58 @@
 # Changelog
 
+## 1.0.0
+
+### FFI
+
+- **BREAKING:** `watch` now employes the builder pattern:
+
+  If you only watch a single value or don't need to use the `old` and `new`
+  values in the watch callback, you can now use quantity-agnostic functions:
+
+  ```gleam
+  vue.watch_computed(first_name)
+  |> vue.and_ref(last_name)
+  |> vue.with_immediate(True)
+  |> vue.with_listener(fn(_, _, _) {
+    // this will fire on a change in `first_name` or `last_name`
+    // old, new values are unavailable
+  })
+
+  // When watching a single value, new/old will be available
+  vue.watch_computed(first_name)
+  |> vue.with_immediate(True)
+  |> vue.with_listener(fn(value, old_value, _) {
+    // this will fire on a change in `first_name` or `last_name`
+    // value, old_value, is a single-item tuple corresponding to the input
+  })
+  ```
+
+  If you do need new/old and watch more than one, use a quantity-aware function:
+
+  ```gleam
+  vue.watch2(#(
+    watch_computed(last_name),
+    watch_ref(last_name),
+  ))
+  |> vue.with_immediate(True)
+  |> vue.with_listener(fn(values, old_values, _) {
+    // this will fire on a change in `first_name` or `last_name`
+    // values, old_values, is a tuple corresponding to the input
+  })
+  ```
+
+- Upgrade dependencies
+
+### LSP
+
+- Upgrade dependencies
+
+### Vite Plugin
+
+- Fix a bug where Gleam imports in a JavaScript file will use a different source
+  than Gleam imports in Gleam code.
+- Upgrade dependencies
+
 ## v0.6.1
 
 ### FFI

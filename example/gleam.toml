@@ -1,7 +1,7 @@
 name = "vue_gleam_example"
 version = "0.1.0"
 licenses = ["Apache-2.0"]
-description = "Vue composition API bindings for Gleam example app"
+description = "Vue + Gleam example app"
 
 gleam = "~> 1.0"
 target = "javascript"
@@ -12,10 +12,10 @@ repository = { type = "github", user = "ofekd", repo = "vue_gleam" }
 typescript_declarations = true
 
 [dependencies]
-gleam_stdlib = "~> 0.34 or ~> 1.0"
+gleam_stdlib = ">= 0.47.0 and < 1.0.0"
 vleam = { path = "../" }
 birl = ">= 1.6.1 and < 2.0.0"
-gleam_json = ">= 1.0.0 and < 2.0.0"
+gleam_json = ">= 2.0.0 and < 3.0.0"
 
 [dev-dependencies]
 gleeunit = "~> 1.0"

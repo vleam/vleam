@@ -43,17 +43,17 @@ export async function toVleamGeneratedPath(
 
 export async function toVueOriginalPath(
   projectRoot: string,
-  generatedGleamPath: string,
+  vleamGeneratedPath: string,
 ): Promise<string | undefined> {
   const relativeModulePath = path
     .relative(
       baseGeneratedGleamPath(projectRoot),
-      path.dirname(generatedGleamPath),
+      path.dirname(vleamGeneratedPath),
     )
     .toLowerCase();
 
   const moduleFileName = path
-    .basename(generatedGleamPath)
+    .basename(vleamGeneratedPath)
     .replace(".gleam", "");
 
   const srcPath = path.join(projectRoot, SRC_DIR);
@@ -87,18 +87,6 @@ export function getGleamBlockFromCode(sfcCode: string) {
   }
 
   return scriptBlock;
-}
-
-export async function getGleamBlockFromPath(vueSfcPath: string) {
-  if (!vueSfcPath.endsWith(".vue")) {
-    return null;
-  }
-
-  const sfcCode = await fs.readFile(vueSfcPath, {
-    encoding: "utf8",
-  });
-
-  return getGleamBlockFromCode(sfcCode);
 }
 
 const BUILD_COMMAND = "gleam build --target=javascript";
@@ -164,7 +152,10 @@ async function resolveGleamCompiledPath(
     ? await toVleamGeneratedPath(projectRoot, filePath)
     : filePath;
 
-  const sourceRelPath = path.relative(srcPath, gleamFilePath);
+  const sourceRelPath = path.isAbsolute(gleamFilePath)
+    ? path.relative(srcPath, gleamFilePath)
+    : gleamFilePath;
+
   return path.join(
     projectRoot,
     GLEAM_COMPILED_ROOT,
@@ -173,16 +164,37 @@ async function resolveGleamCompiledPath(
   );
 }
 
-export async function resolveGleamImport(
+export async function rewriteGleamImports(
   projectRoot: string,
   filePath: string,
   importPath: string,
   projectName?: string,
 ) {
+  const origin = importPath;
   if (importPath.startsWith("hex:")) {
     return path.join(projectRoot, GLEAM_COMPILED_ROOT, importPath.slice(4));
-  }
+  } else if (importPath.endsWith(".gleam")) {
+    // src is hardcoded because that's how Gleam works
+    if (importPath.startsWith("/src")) {
+      importPath = importPath.slice(5);
+    } else if (importPath.startsWith(".")) {
+      importPath = path.resolve(path.dirname(filePath), importPath);
+    } else {
+      // must start with a `.` or `/src`, otherwise can be `hex`/`npm` import
+      return;
+    }
 
+    return await resolveGleamCompiledPath(projectRoot, importPath, projectName);
+  }
+}
+
+export async function rewriteRelativeImports(
+  projectRoot: string,
+  filePath: string,
+  importPath: string,
+  projectName?: string,
+) {
+  // must start with a `.`, otherwise can be `hex`/`npm` import
   if (!importPath.startsWith(".")) {
     return;
   }

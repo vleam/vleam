@@ -17,27 +17,11 @@
       });
     in
     {
-      devShells = forEachSupportedSystem ({ pkgs, lib }:
-        let
-          gleam_150 = pkgs.rustPlatform.buildRustPackage rec {
-            pname = "gleam";
-            version = "1.5.0";
-            src = pkgs.fetchFromGitHub {
-              owner = "gleam-lang";
-              repo = pname;
-              rev = "refs/tags/v${version}";
-              hash = "sha256-buMnbBg+/vHXzbBuMPuV8AfdUmYA9J6WTXP7Oqrdo34=";
-            };
-            nativeBuildInputs = [ pkgs.git pkgs.pkg-config ];
-            buildInputs = [ pkgs.openssl ];
-            cargoHash = "sha256-0Vtf9UXLPW5HuqNIAGNyqIXCMTITdG7PuFdw4H4v6a4=";
-            passthru.updateScript = pkgs.nix-update-script { };
-          };
-        in {
+      devShells = forEachSupportedSystem ({ pkgs, lib }: {
         default = pkgs.mkShell {
           packages = with pkgs; [
             vscodium
-            gleam_150
+            gleam
             node2nix
             nodejs
             pnpm
