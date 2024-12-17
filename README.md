@@ -2,48 +2,35 @@
   <img height="200" src="logo.png">
 </p>
 
-```vue
-<template>
-  <div>{{ count }}</div>
-  <button @click="() => increment()">Increment</button>
-</template>
+What's nicer, this TypeScript...
 
-<script lang="gleam">
-import gleam/option.{Some}
-import vleam/vue.{type Component, Prop, define_component, setup, with_1_prop}
-
-// THIS FUNCTION MUST EXIST
-pub fn default_export() -> Component {
-  define_component([], [], False)
-  |> with_1_prop(#(Prop("initialCount", Some(0))))
-  // Props are handed as Computed to stay reactive
-  |> setup(fn(props: #(Computed(Int)), _, _) {
-    let initial_count = props.0
-
-    let count =
-      initial_count
-      |> vue.computed_value
-      |> vue.ref
-
-    let increment = fn() -> Int {
-      let current_count =
-        count
-        |> vue.ref_value
-
-      count
-      |> vue.ref_set(current_count)
-
-      current_count
-    }
-
-    // returning an Error will cause `setup` to throw it (don't do that)
-    Ok(#(
-      #("count", count),
-      #("increment", increment),
-    ))
-  })
+```typescript
+BaseProps = {
+  title: string;
 }
-</script>
+
+SuccessProps = BaseProps & {
+  variant: 'success';
+  message: string;
+  errorCode?: never;
+}
+
+ErrorProps = BaseProps & {
+  variant: 'error';
+  errorCode: string;
+  message?: never;
+}
+
+type Props = SuccessProps | ErrorProps;
+```
+
+...or this Gleam?
+
+```gleam
+type NotificationProps {
+  SuccessProps(title: String, message: String)
+  ErrorProps(title: String, error_code: String)
+}
 ```
 
 # Vleam
@@ -142,8 +129,13 @@ import { new_todo } from "../vleam_todo/models.gleam";
 
 In Vue SFCs, you can use Gleam like so:
 
-```gleam
-// this code is inside <script lang="gleam"> </script>
+```vue
+<template>
+  <div>{{ count }}</div>
+  <button @click="() => increment()">Increment</button>
+</template>
+
+<script lang="gleam">
 import gleam/option.{Some}
 import vleam/vue.{type Component, Prop, define_component, setup, with_1_prop}
 
@@ -155,18 +147,12 @@ pub fn default_export() -> Component {
   |> setup(fn(props: #(Computed(Int)), _, _) {
     let initial_count = props.0
 
-    let count =
-      initial_count
-      |> vue.computed_value
-      |> vue.ref
+    let count = initial_count |> vue.computed_value |> vue.ref
 
     let increment = fn() -> Int {
-      let current_count =
-        count
-        |> vue.ref_value
+      let current_count = count |> vue.ref_value
 
-      count
-      |> vue.ref_set(current_count)
+      count |> vue.ref_set(current_count)
 
       current_count
     }
@@ -178,6 +164,7 @@ pub fn default_export() -> Component {
     ))
   })
 }
+</script>
 ```
 
 Note that a Gleam script block inside a Vue SFC, without exception, MUST declare
