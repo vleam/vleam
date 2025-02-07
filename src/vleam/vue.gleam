@@ -45,6 +45,24 @@ pub fn next_tick_action(callback: fn() -> Nil) -> Promise(Nil)
 /// See `define_component` for a full example.
 pub type ComponentBase(required_props, nullable_props, emits)
 
+/// Convenience function to make `Prop` definitions more readable
+///
+/// ```gleam
+/// Prop("name", with_default("John Sumisu"))
+/// ```
+pub fn with_default(default: default) -> Option(default) {
+  Some(default)
+}
+
+/// Convenience function to make `Prop` definitions more readable
+///
+/// ```gleam
+/// Prop("name", required())
+/// ```
+pub fn required() -> Option(default) {
+  None
+}
+
 /// Prop record to be used on component definition.
 /// See `define_component` for a full example.
 pub type Prop(value) {
@@ -112,10 +130,10 @@ pub type NullableProp(value) {
 ///     False,
 ///   )
 ///   |> with_1_prop(
-///     Prop("initialName", None),
+///     Prop("initialName", vue.required()),
 ///   )
 ///   |> with_1_nullable_prop(
-///     Prop("greeting", Some("Hello, ")),
+///     Prop("greeting", vue.with_default("Hello, ")),
 ///   )
 ///   // Props are handed as Computed for reactivity. It's best practice to
 ///   // always type them, as types aren't always inferred.

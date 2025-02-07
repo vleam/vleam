@@ -142,7 +142,7 @@ import vleam/vue.{type Component, Prop, define_component, setup, with_1_prop}
 // THIS FUNCTION MUST EXIST
 pub fn default_export() -> Component {
   define_component([], [], False)
-  |> with_1_prop(#(Prop("initialCount", Some(0))))
+  |> with_1_prop(#(Prop("initialCount", vue.with_default(0))))
   // Props are handed as Computed to stay reactive
   |> setup(fn(props: #(Computed(Int)), _, _) {
     let initial_count = props.0
