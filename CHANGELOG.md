@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased
+
+### FFI
+
+- Upgrade dependencies
+
+### LSP
+
+- Upgrade dependencies
+
+### Vite plugin
+
+- Upgrade dependencies
+
 ## 1.0.0
 
 ### FFI
