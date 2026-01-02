@@ -1,18 +1,13 @@
 {
   description = "A Nix-flake-based Gleam development environment";
 
-  inputs.nixpkgs.url = "https://flakehub.com/f/NixOS/nixpkgs/0.1.*.tar.gz";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
 
   outputs = { self, nixpkgs }:
     let
-      overlays = [
-        (final: prev: {
-          nodejs = prev.nodejs_latest;
-        })
-      ];
       supportedSystems = [ "x86_64-linux" "aarch64-linux" "x86_64-darwin" "aarch64-darwin" ];
       forEachSupportedSystem = f: nixpkgs.lib.genAttrs supportedSystems (system: f {
-        pkgs = import nixpkgs { inherit overlays system; };
+        pkgs = import nixpkgs { inherit system; };
         lib = nixpkgs.lib;
       });
     in
@@ -23,12 +18,13 @@
             vscodium
             gleam
             node2nix
-            nodejs
+            nodejs_24
             pnpm
 
             typescript
             nodePackages.typescript-language-server
             vue-language-server
+            prettier
           ];
         };
       });

@@ -1,6 +1,6 @@
 import * as fs from "node:fs/promises";
 import MagicString from "magic-string";
-import type { Plugin, ResolvedConfig, ViteDevServer } from "vite";
+import type { ResolvedConfig, ViteDevServer } from "vite";
 import {
   gleamBuild,
   toVleamGeneratedPath,
@@ -154,18 +154,18 @@ const transform = async (
   return {};
 };
 
-export async function vitePluginVueVleam(): Promise<Plugin> {
+export function vitePluginVueVleam() {
   let config: ResolvedConfig;
   let server: ViteDevServer | undefined;
+  let projectName = "";
 
   const projectRoot = process.cwd();
-  const projectName = await gleamProjectName(projectRoot);
 
   const gleamScriptSfcs = new Set<string>();
 
   return {
     name: "vite-plugin-vue-gleam-script",
-    enforce: "pre",
+    enforce: "pre" as const,
     configResolved(resolvedConfig) {
       config = resolvedConfig;
     },
@@ -173,6 +173,7 @@ export async function vitePluginVueVleam(): Promise<Plugin> {
       server = wsServer;
     },
     async buildStart() {
+      projectName = await gleamProjectName(projectRoot);
       await cleanGenerated(projectRoot);
 
       try {
@@ -288,5 +289,5 @@ export async function vitePluginVueVleam(): Promise<Plugin> {
         };
       }
     },
-  } satisfies Plugin;
+  };
 }
