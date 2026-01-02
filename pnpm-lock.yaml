@@ -27,7 +27,7 @@ importers:
         specifier: ^3.0.0
         version: 3.0.0
       vite:
-        specifier: ^7.2.7
+        specifier: ^7
         version: 7.2.7(@types/node@25.0.1)(yaml@2.7.0)
       vscode-jsonrpc:
         specifier: ^8.2.1
