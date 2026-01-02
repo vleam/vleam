@@ -1,6 +1,6 @@
 {
   "name": "vleam",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "Code using Gleam in Vue projects",
   "repository": {
     "url": "https://github.com/vleam/vleam"

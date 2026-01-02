@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.0.0
 
 ### FFI
 
@@ -20,6 +20,7 @@ Prop("address", required())
 
 ### Vite plugin
 
+- **BREAKING:** `vite` is now a peer dependency
 - Upgrade dependencies
 
 ## 1.0.0
