@@ -2,6 +2,12 @@
   <img height="200" src="logo.png">
 </p>
 
+> **Unmaintained**: [Nestful](https://nestful.app), the product for which Vleam was originally
+> developed, no longer uses Vue, and instead moved to using [Lustre exclusively](https://blog.nestful.app/p/how-we-dropped-vue-for-gleam-and).
+> Therefore, work on Vleam had stopped. It should stay fairly stable by now, so
+> feel free to give it a shot -- it's always nice to use more Gleam and less JS.
+> You can drop us a line at contact [at] nestful [dot] app if you need help.
+
 What's nicer, this TypeScript...
 
 ```typescript
